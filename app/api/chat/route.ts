@@ -1,63 +1,65 @@
-import { streamText } from "ai"
-import { createGoogleGenerativeAI } from "@ai-sdk/google"
+import { GoogleGenerativeAI } from "@google/generative-ai"
+import { type NextRequest, NextResponse } from "next/server"
 
-const google = createGoogleGenerativeAI({
-  apiKey: "AIzaSyDH3jq7MVIsdU0jm5QTtWPKRvxvlChuEM8",
-})
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "")
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { messages, fileContext, requireFileContext } = await req.json()
+    const { message, fileContext, fileName } = await request.json()
 
-    console.log("📤 Mensagens recebidas:", messages)
-    console.log("📄 Contexto do arquivo:", fileContext ? "Presente" : "Ausente")
-
-    // Preparar mensagens com contexto do arquivo se disponível
-    let systemMessage = "Você é a Vini AI, um assistente inteligente e prestativo."
-
-    if (fileContext) {
-      systemMessage += `\n\nIMPORTANTE: O usuário carregou um arquivo com o seguinte conteúdo em Markdown:\n\n${fileContext}\n\nVocê DEVE usar este conteúdo para responder às perguntas do usuário. Seja preciso e cite partes específicas do arquivo quando relevante. Não responda perguntas que não estejam relacionadas ao conteúdo do arquivo.`
-    } else if (requireFileContext) {
-      return new Response(
-        JSON.stringify({
-          error: "Por favor, faça uma pergunta relacionada ao arquivo carregado.",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      )
+    if (!message) {
+      return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
 
-    const result = await streamText({
-      model: google("gemini-2.0-flash"),
-      system: systemMessage,
-      messages: messages.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-      temperature: 0.7,
-      maxTokens: 4096, // Aumentado de 2048 para 4096
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        maxOutputTokens: 4096,
+        temperature: 0.7,
+        topP: 0.8,
+        topK: 40,
+      },
     })
 
-    return result.toDataStreamResponse({
+    let prompt = message
+    if (fileContext && fileName) {
+      prompt = `Contexto do arquivo "${fileName}":\n\n${fileContext}\n\n---\n\nPergunta do usuário: ${message}\n\nPor favor, responda baseado no conteúdo do arquivo fornecido. Se a pergunta não puder ser respondida com base no arquivo, informe isso claramente.`
+    }
+
+    const result = await model.generateContentStream(prompt)
+
+    const encoder = new TextEncoder()
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of result.stream) {
+            const chunkText = chunk.text()
+            if (chunkText) {
+              const data = JSON.stringify({ content: chunkText })
+              controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+            }
+          }
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"))
+          controller.close()
+        } catch (error) {
+          console.error("Stream error:", error)
+          controller.error(error)
+        }
+      },
+    })
+
+    return new Response(stream, {
       headers: {
+        "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
       },
     })
   } catch (error) {
-    console.error("💥 Erro na API de chat:", error)
-
-    return new Response(
-      JSON.stringify({
-        error: "Erro ao processar sua solicitação. Tente novamente.",
-        details: error instanceof Error ? error.message : "Erro desconhecido",
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    )
+    console.error("API Error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
