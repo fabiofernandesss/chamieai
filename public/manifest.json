@@ -1,30 +1,29 @@
 {
   "name": "Vini AI - Assistente Inteligente",
   "short_name": "Vini AI",
-  "description": "Assistente de IA avançado com interface elegante, reconhecimento de voz e recursos de streaming em tempo real",
+  "description": "Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
-  "theme_color": "#667eea",
+  "theme_color": "#000000",
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "pt-BR",
-  "dir": "ltr",
   "categories": ["productivity", "utilities", "education"],
   "icons": [
     {
       "src": "/favicon.ico",
-      "sizes": "16x16 32x32 48x48",
+      "sizes": "32x32",
       "type": "image/x-icon"
     },
     {
-      "src": "/favicon.svg",
+      "src": "/favicon.png",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon.svg",
+      "src": "/icon.png",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
@@ -33,21 +32,13 @@
       "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable any"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "narrow"
+      "purpose": "any maskable"
     }
   ],
   "shortcuts": [
@@ -64,6 +55,13 @@
       ]
     }
   ],
-  "related_applications": [],
-  "prefer_related_applications": false
+  "screenshots": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Vini AI Interface"
+    }
+  ]
 }

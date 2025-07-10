@@ -83,7 +83,6 @@ export default function ChatApp() {
   const [isRecording, setIsRecording] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
-  const [fullTranscript, setFullTranscript] = useState("")
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -149,7 +148,7 @@ export default function ChatApp() {
     }
   }
 
-  // Função para iniciar gravação de áudio - CORRIGIDA
+  // Função para iniciar gravação de áudio
   const startRecording = async () => {
     try {
       // Verificar se o navegador suporta Web Speech API
@@ -161,9 +160,6 @@ export default function ChatApp() {
         recognition.interimResults = true
         recognition.lang = "pt-BR"
 
-        // Limpar transcript anterior
-        setFullTranscript("")
-
         recognition.onstart = () => {
           setIsRecording(true)
           setRecordingTime(0)
@@ -173,28 +169,14 @@ export default function ChatApp() {
         }
 
         recognition.onresult = (event: any) => {
-          let interimTranscript = ""
           let finalTranscript = ""
-
           for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript
             if (event.results[i].isFinal) {
-              finalTranscript += transcript
-            } else {
-              interimTranscript += transcript
+              finalTranscript += event.results[i][0].transcript
             }
           }
-
-          // Acumular o texto final
           if (finalTranscript) {
-            setFullTranscript((prev) => {
-              const newTranscript = prev + finalTranscript
-              setInput(newTranscript.trim())
-              return newTranscript
-            })
-          } else if (interimTranscript) {
-            // Mostrar texto temporário no input
-            setInput((fullTranscript + interimTranscript).trim())
+            setInput(finalTranscript.trim())
           }
         }
 
@@ -228,8 +210,6 @@ export default function ChatApp() {
     }
     setIsRecording(false)
     setRecordingTime(0)
-    // Manter o texto final no input
-    setInput(fullTranscript.trim())
   }
 
   const formatRecordingTime = (seconds: number) => {
@@ -434,8 +414,6 @@ export default function ChatApp() {
       return
     }
     handleSubmit(e)
-    // Limpar transcript após envio
-    setFullTranscript("")
     // Scroll para baixo após enviar
     setTimeout(() => {
       scrollToBottom()
@@ -448,136 +426,128 @@ export default function ChatApp() {
         <div className="chat-container">
           {/* Header */}
           <Box className="header-container">
-            <Container size="3" className="p-4 md:p-6">
-              <Flex align="center" justify="between">
-                {/* Left Side - Logo and Title */}
-                <Flex align="center" gap="4">
-                  {/* macOS Traffic Lights - Hidden on mobile */}
-                  <Flex gap="2" className="hidden md:flex">
-                    <Box className="traffic-light traffic-light-red"></Box>
-                    <Box className="traffic-light traffic-light-yellow"></Box>
-                    <Box className="traffic-light traffic-light-green"></Box>
-                  </Flex>
-
-                  <Flex align="center" gap="3">
-                    <div className="vini-logo">
-                      <ChatBubbleIcon className="vini-logo-icon w-6 h-6 text-white" />
-                    </div>
-                    <Box>
-                      <Text size="5" weight="bold" className="text-white font-modern">
-                        Vini AI
-                      </Text>
-                      <Text size="2" className="text-gray-400 hidden md:block font-modern">
-                        Assistente Inteligente
-                      </Text>
-                    </Box>
-                  </Flex>
+            <Flex align="center" justify="between" className="p-4 md:p-6">
+              {/* Left Side - Logo and Title */}
+              <Flex align="center" gap="4">
+                {/* macOS Traffic Lights - Hidden on mobile */}
+                <Flex gap="2" className="hidden md:flex">
+                  <Box className="traffic-light traffic-light-red"></Box>
+                  <Box className="traffic-light traffic-light-yellow"></Box>
+                  <Box className="traffic-light traffic-light-green"></Box>
                 </Flex>
 
-                {/* Right Side - Actions */}
                 <Flex align="center" gap="3">
-                  {/* Upload Button */}
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isProcessing}
-                    className="chat-button chat-button-secondary"
-                  >
-                    <UploadIcon className="w-4 h-4" />
-                    <span className="hidden md:inline">Upload</span>
-                  </button>
-
-                  {/* Status Badge */}
-                  {isStreaming && (
-                    <div className="chat-badge bg-green-500/20 text-green-300 border border-green-500/30 animate-pulse px-3 py-1">
-                      <Flex align="center" gap="2">
-                        <Box className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></Box>
-                        <Text size="1" className="hidden md:inline font-modern">
-                          Gerando...
-                        </Text>
-                      </Flex>
-                    </div>
-                  )}
+                  <div className="vini-logo">
+                    <ChatBubbleIcon className="vini-logo-icon w-6 h-6 text-white" />
+                  </div>
+                  <Box>
+                    <Text size="5" weight="bold" className="text-white font-modern">
+                      Vini AI
+                    </Text>
+                    <Text size="2" className="text-gray-400 hidden md:block font-modern">
+                      Assistente Inteligente
+                    </Text>
+                  </Box>
                 </Flex>
               </Flex>
-            </Container>
+
+              {/* Right Side - Actions */}
+              <Flex align="center" gap="3">
+                {/* Upload Button */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isProcessing}
+                  className="chat-button chat-button-secondary"
+                >
+                  <UploadIcon className="w-4 h-4" />
+                  <span className="hidden md:inline">Upload</span>
+                </button>
+
+                {/* Status Badge */}
+                {isStreaming && (
+                  <div className="chat-badge bg-green-500/20 text-green-300 border border-green-500/30 animate-pulse px-3 py-1">
+                    <Flex align="center" gap="2">
+                      <Box className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></Box>
+                      <Text size="1" className="hidden md:inline font-modern">
+                        Gerando...
+                      </Text>
+                    </Flex>
+                  </div>
+                )}
+              </Flex>
+            </Flex>
           </Box>
 
           {/* Audio Recording Indicator */}
           {isRecording && (
             <div className="audio-recording-indicator">
-              <Container size="3">
-                <Flex align="center" justify="between">
-                  <Flex align="center" gap="3">
-                    <div className="audio-waveform">
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} className="audio-waveform-bar"></div>
-                      ))}
-                    </div>
-                    <Text size="2" className="text-red-300 font-modern">
-                      🎤 Gravando... {formatRecordingTime(recordingTime)}
-                    </Text>
-                  </Flex>
-                  <button
-                    onClick={stopRecording}
-                    className="chat-button chat-button-danger"
-                    style={{ height: "32px", padding: "0 12px" }}
-                  >
-                    <StopIcon className="w-3 h-3" />
-                    <span className="text-xs">Parar</span>
-                  </button>
+              <Flex align="center" justify="between">
+                <Flex align="center" gap="3">
+                  <div className="audio-waveform">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="audio-waveform-bar"></div>
+                    ))}
+                  </div>
+                  <Text size="2" className="text-red-300 font-modern">
+                    🎤 Gravando... {formatRecordingTime(recordingTime)}
+                  </Text>
                 </Flex>
-              </Container>
+                <button
+                  onClick={stopRecording}
+                  className="chat-button chat-button-danger"
+                  style={{ height: "32px", padding: "0 12px" }}
+                >
+                  <StopIcon className="w-3 h-3" />
+                  <span className="text-xs">Parar</span>
+                </button>
+              </Flex>
             </div>
           )}
 
           {/* File Upload Progress */}
           {isProcessing && (
-            <Container size="3" className="p-4">
-              <Box className="file-processing-card p-4">
-                <Flex align="center" gap="3">
-                  <FileTextIcon className="w-5 h-5 text-blue-400" />
-                  <Box className="flex-1">
-                    <Text size="2" className="text-gray-300 mb-2 font-modern">
-                      Processando arquivo... {uploadProgress}%
-                    </Text>
-                    <div className="progress-root h-2 w-full">
-                      <div
-                        className="progress-indicator h-full transition-all duration-300"
-                        style={{ width: `${uploadProgress}%` }}
-                      ></div>
-                    </div>
-                  </Box>
-                </Flex>
-              </Box>
-            </Container>
+            <Box className="file-processing-card p-4 m-4">
+              <Flex align="center" gap="3">
+                <FileTextIcon className="w-5 h-5 text-blue-400" />
+                <Box className="flex-1">
+                  <Text size="2" className="text-gray-300 mb-2 font-modern">
+                    Processando arquivo... {uploadProgress}%
+                  </Text>
+                  <div className="progress-root h-2 w-full">
+                    <div
+                      className="progress-indicator h-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
+                </Box>
+              </Flex>
+            </Box>
           )}
 
           {/* Uploaded File Info */}
           {uploadedFile && (
-            <Container size="3" className="p-4">
-              <Box className="file-upload-card p-4">
-                <Flex align="center" justify="between" className="p-3">
-                  <Flex align="center" gap="3">
-                    <FileTextIcon className="w-5 h-5 text-green-400" />
-                    <Box>
-                      <Text size="3" weight="bold" className="text-green-300 font-modern">
-                        📄 {uploadedFile.name}
-                      </Text>
-                      <Text size="2" className="text-green-400 font-modern">
-                        Arquivo carregado! Faça perguntas sobre o conteúdo.
-                      </Text>
-                    </Box>
-                  </Flex>
-                  <button
-                    onClick={removeFile}
-                    className="chat-button chat-button-danger"
-                    style={{ height: "32px", padding: "0 8px" }}
-                  >
-                    <Cross2Icon className="w-3 h-3" />
-                  </button>
+            <Box className="file-upload-card p-4 m-4">
+              <Flex align="center" justify="between" className="p-3">
+                <Flex align="center" gap="3">
+                  <FileTextIcon className="w-5 h-5 text-green-400" />
+                  <Box>
+                    <Text size="3" weight="bold" className="text-green-300 font-modern">
+                      📄 {uploadedFile.name}
+                    </Text>
+                    <Text size="2" className="text-green-400 font-modern">
+                      Arquivo carregado! Faça perguntas sobre o conteúdo.
+                    </Text>
+                  </Box>
                 </Flex>
-              </Box>
-            </Container>
+                <button
+                  onClick={removeFile}
+                  className="chat-button chat-button-danger"
+                  style={{ height: "32px", padding: "0 8px" }}
+                >
+                  <Cross2Icon className="w-3 h-3" />
+                </button>
+              </Flex>
+            </Box>
           )}
 
           {/* Hidden File Input */}
@@ -593,8 +563,8 @@ export default function ChatApp() {
                       <ChatBubbleIcon className="w-12 h-12 text-white" />
                     </div>
                     <Box>
-                      <Text size="6" weight="bold" className="text-white font-modern">
-                        Olá! Eu sou a Vini AI
+                      <Text size="6" weight="bold" className="text-white font-modern mx-1">
+                        Olá! Eu sou a Vini AI  
                       </Text>
                       <Text size="3" className="text-gray-400 max-w-md mt-2 font-modern">
                         Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.
