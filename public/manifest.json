@@ -4,47 +4,19 @@
   "description": "Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#667eea",
+  "background_color": "#1a1a1a",
+  "theme_color": "#3B82F6",
   "orientation": "portrait-primary",
-  "scope": "/",
-  "lang": "pt-BR",
-  "categories": ["productivity", "utilities", "education"],
   "icons": [
     {
-      "src": "/favicon.png",
-      "sizes": "32x32 48x48 64x64 128x128 256x256",
-      "type": "image/png",
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
-    },
-    {
-      "src": "/favicon.svg", 
-      "sizes": "32x32",
-      "type": "image/svg+xml"
     }
   ],
-  "shortcuts": [
-    {
-      "name": "Nova Conversa",
-      "short_name": "Chat",
-      "description": "Iniciar uma nova conversa com Vini AI",
-      "url": "/",
-      "icons": [
-        {
-          "src": "/favicon.png",
-          "sizes": "32x32",
-          "type": "image/png"
-        }
-      ]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/metatag.png",
-      "sizes": "1200x630",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Vini AI Interface"
-    }
-  ]
+  "categories": ["productivity", "utilities"],
+  "lang": "pt-BR",
+  "scope": "/",
+  "prefer_related_applications": false
 }

@@ -1,0 +1,17 @@
+FAVICON VINI AI
+===============
+
+Favicon criado especialmente para o projeto Vini AI.
+
+Características:
+- Formato: SVG (32x32px)
+- Tema: Chat/IA com gradientes modernos
+- Cores: Azul (#3B82F6) e Verde (#10B981)
+- Elementos: Balão de chat com pontos e elementos tecnológicos
+
+Arquivos:
+- favicon.svg: Ícone principal em SVG
+- manifest.json: Manifesto PWA atualizado
+
+O favicon representa um assistente de IA através de um balão de chat moderno
+com elementos visuais que sugerem tecnologia e inteligência artificial. 

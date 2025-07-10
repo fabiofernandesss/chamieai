@@ -60,12 +60,11 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: [
-      { url: "/favicon.png", type: "image/png" },
       { url: "/favicon.svg", type: "image/svg+xml" },
     ],
-    shortcut: "/favicon.png",
+    shortcut: "/favicon.svg",
     apple: [
-      { url: "/favicon.png", type: "image/png" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
     ],
   },
   appleWebApp: {
@@ -90,9 +89,8 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#667eea" />
 
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-        <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/favicon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://generativelanguage.googleapis.com" />
