@@ -83,6 +83,7 @@ export default function ChatApp() {
   const [isRecording, setIsRecording] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
+  const [accumulatedText, setAccumulatedText] = useState("")
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -163,20 +164,30 @@ export default function ChatApp() {
         recognition.onstart = () => {
           setIsRecording(true)
           setRecordingTime(0)
+          setAccumulatedText("") // Limpar texto acumulado ao iniciar
           recordingIntervalRef.current = setInterval(() => {
             setRecordingTime((prev) => prev + 1)
           }, 1000)
         }
 
         recognition.onresult = (event: any) => {
+          let interimTranscript = ""
           let finalTranscript = ""
+
           for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript
             if (event.results[i].isFinal) {
-              finalTranscript += event.results[i][0].transcript
+              finalTranscript += transcript
+            } else {
+              interimTranscript += transcript
             }
           }
+
           if (finalTranscript) {
-            setInput(finalTranscript.trim())
+            setAccumulatedText((prev) => prev + finalTranscript)
+            setInput(accumulatedText + finalTranscript + interimTranscript)
+          } else {
+            setInput(accumulatedText + interimTranscript)
           }
         }
 
@@ -210,6 +221,7 @@ export default function ChatApp() {
     }
     setIsRecording(false)
     setRecordingTime(0)
+    setAccumulatedText("") // Limpar texto acumulado
   }
 
   const formatRecordingTime = (seconds: number) => {
@@ -414,6 +426,7 @@ export default function ChatApp() {
       return
     }
     handleSubmit(e)
+    setAccumulatedText("") // Limpar texto acumulado após enviar
     // Scroll para baixo após enviar
     setTimeout(() => {
       scrollToBottom()
@@ -426,56 +439,58 @@ export default function ChatApp() {
         <div className="chat-container">
           {/* Header */}
           <Box className="header-container">
-            <Flex align="center" justify="between" className="p-4 md:p-6">
-              {/* Left Side - Logo and Title */}
-              <Flex align="center" gap="4">
-                {/* macOS Traffic Lights - Hidden on mobile */}
-                <Flex gap="2" className="hidden md:flex">
-                  <Box className="traffic-light traffic-light-red"></Box>
-                  <Box className="traffic-light traffic-light-yellow"></Box>
-                  <Box className="traffic-light traffic-light-green"></Box>
-                </Flex>
+            <Container size="3" className="p-4 md:p-6">
+              <Flex align="center" justify="between">
+                {/* Left Side - Logo and Title */}
+                <Flex align="center" gap="4">
+                  {/* macOS Traffic Lights - Hidden on mobile */}
+                  <Flex gap="2" className="hidden md:flex">
+                    <Box className="traffic-light traffic-light-red"></Box>
+                    <Box className="traffic-light traffic-light-yellow"></Box>
+                    <Box className="traffic-light traffic-light-green"></Box>
+                  </Flex>
 
-                <Flex align="center" gap="3">
-                  <div className="vini-logo">
-                    <ChatBubbleIcon className="vini-logo-icon w-6 h-6 text-white" />
-                  </div>
-                  <Box>
-                    <Text size="5" weight="bold" className="text-white font-modern">
-                      Vini AI
-                    </Text>
-                    <Text size="2" className="text-gray-400 hidden md:block font-modern">
-                      Assistente Inteligente
-                    </Text>
-                  </Box>
-                </Flex>
-              </Flex>
-
-              {/* Right Side - Actions */}
-              <Flex align="center" gap="3">
-                {/* Upload Button */}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isProcessing}
-                  className="chat-button chat-button-secondary"
-                >
-                  <UploadIcon className="w-4 h-4" />
-                  <span className="hidden md:inline">Upload</span>
-                </button>
-
-                {/* Status Badge */}
-                {isStreaming && (
-                  <div className="chat-badge bg-green-500/20 text-green-300 border border-green-500/30 animate-pulse px-3 py-1">
-                    <Flex align="center" gap="2">
-                      <Box className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></Box>
-                      <Text size="1" className="hidden md:inline font-modern">
-                        Gerando...
+                  <Flex align="center" gap="3">
+                    <div className="vini-logo">
+                      <ChatBubbleIcon className="vini-logo-icon w-6 h-6 text-white" />
+                    </div>
+                    <Box>
+                      <Text size="5" weight="bold" className="text-white font-modern">
+                        Vini AI
                       </Text>
-                    </Flex>
-                  </div>
-                )}
+                      <Text size="2" className="text-gray-400 hidden md:block font-modern">
+                        Assistente Inteligente
+                      </Text>
+                    </Box>
+                  </Flex>
+                </Flex>
+
+                {/* Right Side - Actions */}
+                <Flex align="center" gap="3">
+                  {/* Upload Button */}
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isProcessing}
+                    className="chat-button chat-button-secondary"
+                  >
+                    <UploadIcon className="w-4 h-4" />
+                    <span className="hidden md:inline">Upload</span>
+                  </button>
+
+                  {/* Status Badge */}
+                  {isStreaming && (
+                    <div className="chat-badge bg-green-500/20 text-green-300 border border-green-500/30 animate-pulse px-3 py-1">
+                      <Flex align="center" gap="2">
+                        <Box className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></Box>
+                        <Text size="1" className="hidden md:inline font-modern">
+                          Gerando...
+                        </Text>
+                      </Flex>
+                    </div>
+                  )}
+                </Flex>
               </Flex>
-            </Flex>
+            </Container>
           </Box>
 
           {/* Audio Recording Indicator */}
@@ -564,7 +579,7 @@ export default function ChatApp() {
                     </div>
                     <Box>
                       <Text size="6" weight="bold" className="text-white font-modern mx-1">
-                        Olá! Eu sou a Vini AI  
+                        Olá! Eu sou a Vini AI
                       </Text>
                       <Text size="3" className="text-gray-400 max-w-md mt-2 font-modern">
                         Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.
@@ -664,15 +679,35 @@ export default function ChatApp() {
           <div className="chat-input-container">
             <Container size="3" className="p-4 md:p-6">
               <form onSubmit={handleFormSubmit}>
-                <Flex gap="3" align="center">
+                <Flex gap="3" align="end">
                   <Box className="flex-1">
-                    <input
-                      type="text"
-                      placeholder={uploadedFile ? "Pergunte algo sobre o arquivo..." : "Digite sua mensagem aqui..."}
+                    <textarea
+                      placeholder={
+                        uploadedFile
+                          ? "Pergunte algo sobre o arquivo..."
+                          : "Digite sua mensagem aqui... (Shift+Enter para nova linha)"
+                      }
                       value={input}
                       onChange={handleInputChange}
                       disabled={isLoading || isRecording}
                       className="chat-input"
+                      rows={1}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault()
+                          handleFormSubmit(e)
+                        }
+                      }}
+                      style={{
+                        height: "auto",
+                        minHeight: "50px",
+                        maxHeight: "150px",
+                      }}
+                      onInput={(e) => {
+                        const target = e.target as HTMLTextAreaElement
+                        target.style.height = "auto"
+                        target.style.height = Math.min(target.scrollHeight, 150) + "px"
+                      }}
                     />
                   </Box>
 
