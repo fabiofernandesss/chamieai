@@ -375,6 +375,130 @@ export default function ChatApp() {
     setContinuingMessage(null)
   }
 
+  // Função para renderizar markdown em JSX
+  const renderMarkdownText = (text: string) => {
+    const lines = text.split('\n')
+    const elements: React.ReactNode[] = []
+    
+    lines.forEach((line, lineIndex) => {
+      if (line.trim() === '') {
+        elements.push(<br key={`br-${lineIndex}`} />)
+        return
+      }
+
+      // Processar linha por linha
+      let processedLine: React.ReactNode[] = []
+      let currentText = line
+      let elementIndex = 0
+
+      // Detectar listas
+      const listMatch = currentText.match(/^(\s*)[*+-]\s+(.*)$/)
+      if (listMatch) {
+        const indent = listMatch[1].length
+        const content = listMatch[2]
+        const processedContent = processInlineFormatting(content, `${lineIndex}-list`)
+        
+        elements.push(
+          <div key={`list-${lineIndex}`} className={`flex items-start gap-2 my-1 ${indent > 0 ? 'ml-4' : ''}`}>
+            <span className="text-blue-400 mt-1 text-sm">•</span>
+            <span className="flex-1">{processedContent}</span>
+          </div>
+        )
+        return
+      }
+
+      // Detectar títulos
+      const headerMatch = currentText.match(/^(#{1,6})\s+(.*)$/)
+      if (headerMatch) {
+        const level = headerMatch[1].length
+        const content = headerMatch[2]
+        const processedContent = processInlineFormatting(content, `${lineIndex}-header`)
+        
+        const headerClass = level === 1 ? 'text-xl font-bold text-white mb-2' :
+                           level === 2 ? 'text-lg font-bold text-gray-200 mb-2' :
+                           'text-base font-semibold text-gray-300 mb-1'
+        
+        elements.push(
+          <div key={`header-${lineIndex}`} className={headerClass}>
+            {processedContent}
+          </div>
+        )
+        return
+      }
+
+      // Linha normal com formatação inline
+      const processedContent = processInlineFormatting(currentText, lineIndex.toString())
+      elements.push(
+        <div key={`line-${lineIndex}`} className="leading-relaxed">
+          {processedContent}
+        </div>
+      )
+    })
+
+    return <div className="space-y-1">{elements}</div>
+  }
+
+  // Função para processar formatação inline (negrito, itálico)
+  const processInlineFormatting = (text: string, baseKey: string) => {
+    const elements: React.ReactNode[] = []
+    let currentIndex = 0
+    let elementKey = 0
+
+    // Regex para detectar **negrito**, *itálico*, `código inline`
+    const formatRegex = /(\*\*([^*]+)\*\*|\*([^*]+)\*|`([^`]+)`)/g
+    let match
+
+    while ((match = formatRegex.exec(text)) !== null) {
+      // Adicionar texto antes da formatação
+      if (match.index > currentIndex) {
+        const beforeText = text.slice(currentIndex, match.index)
+        if (beforeText) {
+          elements.push(
+            <span key={`${baseKey}-text-${elementKey++}`}>{beforeText}</span>
+          )
+        }
+      }
+
+      // Adicionar elemento formatado
+      if (match[2]) {
+        // **negrito**
+        elements.push(
+          <strong key={`${baseKey}-bold-${elementKey++}`} className="font-bold text-white">
+            {match[2]}
+          </strong>
+        )
+      } else if (match[3]) {
+        // *itálico*
+        elements.push(
+          <em key={`${baseKey}-italic-${elementKey++}`} className="italic text-gray-200">
+            {match[3]}
+          </em>
+        )
+      } else if (match[4]) {
+        // `código inline`
+        elements.push(
+          <code key={`${baseKey}-code-${elementKey++}`} className="bg-gray-800 text-blue-300 px-1 py-0.5 rounded text-sm font-mono">
+            {match[4]}
+          </code>
+        )
+      }
+
+      currentIndex = match.index + match[0].length
+    }
+
+    // Adicionar texto restante
+    if (currentIndex < text.length) {
+      const remainingText = text.slice(currentIndex)
+      if (remainingText) {
+        elements.push(
+          <span key={`${baseKey}-text-${elementKey++}`}>{remainingText}</span>
+        )
+      }
+    }
+
+    return elements.length > 0 ? elements : text
+  }
+
   const renderMessage = (content: string) => {
     const isLikelyTruncated = (text: string) => {
       const hasUnclosedCode = (text.match(/```/g) || []).length % 2 !== 0
@@ -427,9 +551,13 @@ export default function ChatApp() {
       }
     }
 
-    // Se não há código, retorna texto simples
+    // Se não há código, retorna texto com formatação markdown
     if (parts.length === 0) {
-      return <Text className="whitespace-pre-wrap leading-relaxed font-modern">{content}</Text>
+      return (
+        <div className="whitespace-pre-wrap leading-relaxed font-modern text-gray-200">
+          {renderMarkdownText(content)}
+        </div>
+      )
     }
 
     return (
@@ -447,13 +575,12 @@ export default function ChatApp() {
             )
           } else {
             return (
-              <Text key={part.key} className="whitespace-pre-wrap leading-relaxed font-modern">
-                {part.content}
-              </Text>
+              <div key={part.key} className="whitespace-pre-wrap leading-relaxed font-modern text-gray-200">
+                {renderMarkdownText(part.content)}
+              </div>
             )
           }
         })}
-
       </div>
     )
   }
