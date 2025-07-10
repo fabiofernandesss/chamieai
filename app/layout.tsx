@@ -30,10 +30,10 @@ export const metadata: Metadata = {
     siteName: "Vini AI",
     images: [
       {
-        url: "/metatag.png",
+        url: "/metatag.svg",
         width: 1200,
         height: 630,
-        alt: "Vini AI Logo",
+        alt: "Vini AI - Assistente Inteligente",
       },
     ],
     locale: "pt_BR",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Vini AI - Assistente Inteligente",
     description: "Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.",
-    images: ["/metatag.png"],
+    images: ["/metatag.svg"],
     creator: "@viniai",
   },
   robots: {
@@ -60,11 +60,12 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: [
+      { url: "/favicon.png", type: "image/png", sizes: "32x32" },
       { url: "/favicon.svg", type: "image/svg+xml" },
     ],
-    shortcut: "/favicon.svg",
+    shortcut: "/favicon.png",
     apple: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.png", type: "image/png", sizes: "180x180" },
     ],
   },
   appleWebApp: {
@@ -89,8 +90,9 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#667eea" />
 
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/favicon.png" type="image/png" sizes="180x180" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://generativelanguage.googleapis.com" />
