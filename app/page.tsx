@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Theme, Text, ScrollArea, Flex, Box, Container } from "@radix-ui/themes"
 import {
   PaperPlaneIcon,
@@ -90,6 +90,8 @@ export default function ChatApp() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const recognitionRef = useRef<any>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null)
   const [truncatedMessages, setTruncatedMessages] = useState<Set<string>>(new Set())
   const [continuingMessage, setContinuingMessage] = useState<string | null>(null)
 
@@ -132,6 +134,25 @@ export default function ChatApp() {
     }, 100)
   }
 
+  // Função para redimensionar o textarea
+  const resizeTextarea = () => {
+    if (textareaRef.current) {
+      // Reset para altura mínima
+      textareaRef.current.style.height = "50px"
+      
+      // Se há conteúdo, calcular nova altura
+      if (textareaRef.current.value.trim()) {
+        const newHeight = Math.max(50, Math.min(textareaRef.current.scrollHeight, 150))
+        textareaRef.current.style.height = newHeight + "px"
+      }
+    }
+  }
+
+  // useEffect para redimensionar o textarea quando o input mudar
+  useEffect(() => {
+    resizeTextarea()
+  }, [input])
+
   const handleStop = () => {
     stop()
     setIsStreaming(false)
@@ -160,6 +181,7 @@ export default function ChatApp() {
         recognition.continuous = true
         recognition.interimResults = true
         recognition.lang = "pt-BR"
+        recognition.maxAlternatives = 1
 
         recognition.onstart = () => {
           setIsRecording(true)
@@ -184,8 +206,11 @@ export default function ChatApp() {
           }
 
           if (finalTranscript) {
-            setAccumulatedText((prev) => prev + finalTranscript)
-            setInput(accumulatedText + finalTranscript + interimTranscript)
+            setAccumulatedText((prev) => {
+              const newAccumulated = prev + finalTranscript
+              setInput(newAccumulated + interimTranscript)
+              return newAccumulated
+            })
           } else {
             setInput(accumulatedText + interimTranscript)
           }
@@ -198,7 +223,19 @@ export default function ChatApp() {
         }
 
         recognition.onend = () => {
-          stopRecording()
+          // Não parar imediatamente - dar tempo para pausas naturais
+          if (isRecording) {
+            silenceTimerRef.current = setTimeout(() => {
+              if (isRecording) {
+                try {
+                  recognition.start()
+                } catch (error) {
+                  console.error("Erro ao reiniciar reconhecimento:", error)
+                  stopRecording()
+                }
+              }
+            }, 2000) // Esperar 2 segundos antes de reiniciar
+          }
         }
 
         recognitionRef.current = recognition
@@ -218,6 +255,11 @@ export default function ChatApp() {
     }
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current)
+      recordingIntervalRef.current = null
+    }
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current)
+      silenceTimerRef.current = null
     }
     setIsRecording(false)
     setRecordingTime(0)
@@ -342,7 +384,7 @@ export default function ChatApp() {
 
     // Detecta blocos de código em tempo real
     const codeBlockRegex = /```(\w+)?\n?([\s\S]*?)```/g
-    const parts = []
+    const parts: Array<{type: "text" | "code", content: string, key: string, language?: string}> = []
     let lastIndex = 0
     let match
 
@@ -360,11 +402,12 @@ export default function ChatApp() {
       }
 
       // Adiciona o bloco de código
-      const language = match[1] || "text"
+      const rawLanguage = match[1]
+      const language = rawLanguage && rawLanguage.trim() ? rawLanguage.trim() : "text"
       const code = match[2] || ""
       parts.push({
         type: "code",
-        language,
+        language: language as string,
         content: code,
         key: `code-${match.index}`,
       })
@@ -396,7 +439,7 @@ export default function ChatApp() {
             return (
               <CodeBlock
                 key={part.key}
-                language={part.language}
+                language={part.language || "text"}
                 code={part.content}
                 onCopy={() => copyToClipboard(part.content, part.key)}
                 isCopied={copiedCode === part.key}
@@ -410,12 +453,7 @@ export default function ChatApp() {
             )
           }
         })}
-        {isLikelyTruncated(content) && (
-          <div className="flex items-center gap-2 text-yellow-400 text-sm mt-2 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-            Resposta pode estar incompleta
-          </div>
-        )}
+
       </div>
     )
   }
@@ -521,7 +559,7 @@ export default function ChatApp() {
 
           {/* File Upload Progress */}
           {isProcessing && (
-            <Box className="file-processing-card p-4 m-4">
+            <Box className="file-processing-card p-4">
               <Flex align="center" gap="3">
                 <FileTextIcon className="w-5 h-5 text-blue-400" />
                 <Box className="flex-1">
@@ -541,7 +579,7 @@ export default function ChatApp() {
 
           {/* Uploaded File Info */}
           {uploadedFile && (
-            <Box className="file-upload-card p-4 m-4">
+            <Box className="file-upload-card p-4">
               <Flex align="center" justify="between" className="p-3">
                 <Flex align="center" gap="3">
                   <FileTextIcon className="w-5 h-5 text-green-400" />
@@ -573,24 +611,41 @@ export default function ChatApp() {
             <ScrollArea ref={scrollAreaRef} className="h-full messages-scroll">
               <Container size="3" className="p-4 md:p-6">
                 {messages.length === 0 ? (
-                  <Flex direction="column" align="center" justify="center" className="h-full text-center" gap="6">
-                    <div className="header-logo p-4">
-                      <ChatBubbleIcon className="w-12 h-12 text-white" />
-                    </div>
-                    <Box>
-                      <Text size="6" weight="bold" className="text-white font-modern mx-1">
-                        Olá! Eu sou a Vini AI
-                      </Text>
-                      <Text size="3" className="text-gray-400 max-w-md mt-2 font-modern">
-                        Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.
+                  <div className="welcome-section">
+                    <div className="welcome-content">
+                      {/* Logo animado */}
+                      <div className="welcome-logo">
+                        <div className="logo-glow"></div>
+                        <ChatBubbleIcon className="logo-icon" />
+                      </div>
+                      
+                      {/* Texto principal */}
+                      <div className="welcome-text">
+                        <h1 className="welcome-title">
+                          Olá! Eu sou a <span className="gradient-text">Vini AI</span>
+                        </h1>
+                        <p className="welcome-subtitle">
+                          Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.
+                        </p>
                         {!uploadedFile && (
-                          <Text as="span" className="block mt-2 text-purple-400 font-modern">
-                            💡 Faça upload de um arquivo .txt para fazer perguntas sobre seu conteúdo!
-                          </Text>
+                          <div className="welcome-tip">
+                            <span className="tip-icon">💡</span>
+                            <span className="tip-text">
+                              Faça upload de um arquivo .txt para fazer perguntas sobre seu conteúdo!
+                            </span>
+                          </div>
                         )}
-                      </Text>
-                    </Box>
-                  </Flex>
+                      </div>
+                      
+
+                      
+                      {/* Call to action */}
+                      <div className="welcome-cta">
+                        <div className="cta-text">Comece digitando sua pergunta abaixo</div>
+                        <div className="cta-arrow">↓</div>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <Box className="space-y-6">
                     {messages.map((message) => (
@@ -681,6 +736,7 @@ export default function ChatApp() {
               <form onSubmit={handleFormSubmit}>
                 <div className="chat-input-wrapper">
                   <textarea
+                    ref={textareaRef}
                     placeholder={
                       uploadedFile
                         ? "Pergunte algo sobre o arquivo..."
@@ -697,11 +753,7 @@ export default function ChatApp() {
                         handleFormSubmit(e)
                       }
                     }}
-                    onInput={(e) => {
-                      const target = e.target as HTMLTextAreaElement
-                      target.style.height = "auto"
-                      target.style.height = Math.min(target.scrollHeight, 150) + "px"
-                    }}
+                    onInput={resizeTextarea}
                   />
 
                   <div className="chat-buttons">
