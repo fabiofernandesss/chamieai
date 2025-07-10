@@ -679,62 +679,57 @@ export default function ChatApp() {
           <div className="chat-input-container">
             <Container size="3" className="p-4 md:p-6">
               <form onSubmit={handleFormSubmit}>
-                <Flex gap="3" align="end">
-                  <Box className="flex-1">
-                    <textarea
-                      placeholder={
-                        uploadedFile
-                          ? "Pergunte algo sobre o arquivo..."
-                          : "Digite sua mensagem aqui... (Shift+Enter para nova linha)"
+                <div className="chat-input-wrapper">
+                  <textarea
+                    placeholder={
+                      uploadedFile
+                        ? "Pergunte algo sobre o arquivo..."
+                        : "Digite sua mensagem aqui... (Shift+Enter para nova linha)"
+                    }
+                    value={input}
+                    onChange={handleInputChange}
+                    disabled={isLoading || isRecording}
+                    className="chat-input"
+                    rows={1}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault()
+                        handleFormSubmit(e)
                       }
-                      value={input}
-                      onChange={handleInputChange}
-                      disabled={isLoading || isRecording}
-                      className="chat-input"
-                      rows={1}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault()
-                          handleFormSubmit(e)
-                        }
-                      }}
-                      style={{
-                        height: "auto",
-                        minHeight: "50px",
-                        maxHeight: "150px",
-                      }}
-                      onInput={(e) => {
-                        const target = e.target as HTMLTextAreaElement
-                        target.style.height = "auto"
-                        target.style.height = Math.min(target.scrollHeight, 150) + "px"
-                      }}
-                    />
-                  </Box>
+                    }}
+                    onInput={(e) => {
+                      const target = e.target as HTMLTextAreaElement
+                      target.style.height = "auto"
+                      target.style.height = Math.min(target.scrollHeight, 150) + "px"
+                    }}
+                  />
 
-                  {/* Audio Button */}
-                  <button
-                    type="button"
-                    onClick={isRecording ? stopRecording : startRecording}
-                    disabled={isLoading}
-                    className={`chat-button ${isRecording ? "chat-button-danger recording" : "chat-button-audio"}`}
-                  >
-                    <MicrophoneIcon className="w-4 h-4" />
-                  </button>
-
-                  {isStreaming ? (
-                    <button type="button" onClick={handleStop} className="chat-button chat-button-danger">
-                      <StopIcon className="w-4 h-4" />
-                    </button>
-                  ) : (
+                  <div className="chat-buttons">
+                    {/* Audio Button */}
                     <button
-                      type="submit"
-                      disabled={isLoading || !input.trim() || isRecording}
-                      className="chat-button chat-button-primary"
+                      type="button"
+                      onClick={isRecording ? stopRecording : startRecording}
+                      disabled={isLoading}
+                      className={`chat-button ${isRecording ? "chat-button-danger recording" : "chat-button-audio"}`}
                     >
-                      <PaperPlaneIcon className="w-4 h-4" />
+                      <MicrophoneIcon className="w-4 h-4" />
                     </button>
-                  )}
-                </Flex>
+
+                    {isStreaming ? (
+                      <button type="button" onClick={handleStop} className="chat-button chat-button-danger">
+                        <StopIcon className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        disabled={isLoading || !input.trim() || isRecording}
+                        className="chat-button chat-button-primary"
+                      >
+                        <PaperPlaneIcon className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
               </form>
             </Container>
           </div>

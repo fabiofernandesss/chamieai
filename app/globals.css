@@ -96,9 +96,17 @@
   z-index: 10;
 }
 
+/* Chat Input Wrapper - NEW */
+.chat-input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  width: 100%;
+}
+
 /* Chat Input */
 .chat-input {
-  width: 100%;
+  flex: 1;
   min-height: 50px;
   max-height: 150px;
   padding: 12px 16px;
@@ -130,6 +138,14 @@
   cursor: not-allowed;
 }
 
+/* Chat Buttons Container - NEW */
+.chat-buttons {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 /* Buttons */
 .chat-button {
   display: flex;
@@ -137,6 +153,7 @@
   justify-content: center;
   gap: 6px;
   height: 50px;
+  min-width: 50px;
   padding: 0 16px;
   border: none;
   border-radius: 5px;
@@ -146,6 +163,7 @@
   transition: all 0.2s ease;
   outline: none;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .chat-button:disabled {
@@ -377,6 +395,7 @@
 @media (max-width: 768px) {
   .chat-button {
     height: 50px;
+    min-width: 50px;
     padding: 0 12px;
   }
 
@@ -386,6 +405,14 @@
 
   .chat-input {
     font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .chat-input-wrapper {
+    gap: 8px;
+  }
+
+  .chat-buttons {
+    gap: 6px;
   }
 }
 

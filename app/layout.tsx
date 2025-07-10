@@ -19,14 +19,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://viniai.netlify.app"),
+  metadataBase: new URL("https://viniai.vercel.app"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "Vini AI - Assistente Inteligente",
     description: "Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.",
-    url: "https://viniai.netlify.app",
+    url: "https://viniai.vercel.app",
     siteName: "Vini AI",
     images: [
       {
@@ -36,10 +36,10 @@ export const metadata: Metadata = {
         alt: "Vini AI Logo",
       },
       {
-        url: "/icon.png",
-        width: 512,
-        height: 512,
-        alt: "Vini AI Logo SVG",
+        url: "/icon-192.png",
+        width: 192,
+        height: 192,
+        alt: "Vini AI Logo",
       },
     ],
     locale: "pt_BR",
@@ -67,8 +67,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
-      { url: "/favicon.png", type: "image/svg+xml" },
-      { url: "/icon.png", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
     apple: [
@@ -94,12 +94,30 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        <meta name="theme-color" content="#000000" />
-        <meta name="msapplication-TileColor" content="#000000" />
+        <meta name="theme-color" content="#667eea" />
+        <meta name="msapplication-TileColor" content="#667eea" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://generativelanguage.googleapis.com" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                      console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                      console.log('SW registration failed: ', registrationError);
+                    });
+                });
+              }
+            `,
+          }}
+        />
       </head>
       <body className={inter.className}>
         <Theme appearance="dark">{children}</Theme>
