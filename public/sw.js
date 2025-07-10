@@ -1,7 +1,8 @@
 const CACHE_NAME = "vini-ai-v1.0.0"
 const urlsToCache = [
   "/",
-  "/favicon.svg",
+  "/favicon.png",
+  "/metatag.png",
   "/manifest.json",
 ]
 
