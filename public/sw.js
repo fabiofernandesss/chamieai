@@ -1,4 +1,4 @@
-const CACHE_NAME = "vini-ai-v1.2.0"
+const CACHE_NAME = "vini-ai-v1.3.0"
 const urlsToCache = [
   "/",
   "/favicon.png",
@@ -7,7 +7,7 @@ const urlsToCache = [
 ]
 
 // Debug logs
-console.log("🔧 Service Worker: Iniciando v1.2.0...")
+console.log("🔧 Service Worker: Iniciando v1.3.0...")
 
 self.addEventListener("install", (event) => {
   console.log("🔧 Service Worker: Instalando...")
@@ -31,11 +31,46 @@ self.addEventListener("install", (event) => {
       })
       .then(() => {
         console.log("✅ Service Worker instalado com sucesso!")
-        return self.skipWaiting() // Força ativação imediata
+        // Força ativação imediata
+        self.skipWaiting()
       })
       .catch((error) => {
         console.error("❌ Erro na instalação do SW:", error)
       })
+  )
+})
+
+self.addEventListener("activate", (event) => {
+  console.log("🔧 Service Worker: Ativando...")
+  event.waitUntil(
+    Promise.all([
+      // Limpar caches antigos
+      caches.keys()
+        .then((cacheNames) => {
+          return Promise.all(
+            cacheNames.map((cacheName) => {
+              if (cacheName !== CACHE_NAME) {
+                console.log("🗑️ Removendo cache antigo:", cacheName)
+                return caches.delete(cacheName)
+              }
+            })
+          )
+        }),
+      // Tomar controle imediato
+      self.clients.claim()
+    ])
+    .then(() => {
+      console.log("✅ Service Worker ativado e controlando páginas!")
+      // Notificar todas as páginas sobre a ativação
+      self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'SW_ACTIVATED',
+            version: CACHE_NAME
+          })
+        })
+      })
+    })
   )
 })
 
@@ -116,31 +151,6 @@ self.addEventListener("fetch", (event) => {
   )
 })
 
-self.addEventListener("activate", (event) => {
-  console.log("🔧 Service Worker: Ativando...")
-  event.waitUntil(
-    Promise.all([
-      // Limpar caches antigos
-      caches.keys()
-        .then((cacheNames) => {
-          return Promise.all(
-            cacheNames.map((cacheName) => {
-              if (cacheName !== CACHE_NAME) {
-                console.log("🗑️ Removendo cache antigo:", cacheName)
-                return caches.delete(cacheName)
-              }
-            })
-          )
-        }),
-      // Tomar controle imediato
-      self.clients.claim()
-    ])
-    .then(() => {
-      console.log("✅ Service Worker ativado!")
-    })
-  )
-})
-
 // Listener para mensagens do cliente
 self.addEventListener('message', (event) => {
   console.log("📨 Mensagem recebida:", event.data)
@@ -155,9 +165,4 @@ self.addEventListener('message', (event) => {
   }
 })
 
-// Notificar sobre atualizações
-self.addEventListener('controllerchange', () => {
-  console.log("🔄 Controller mudou - nova versão ativa!")
-})
-
-console.log("✅ Service Worker v1.2.0: Configurado com sucesso!")
+console.log("✅ Service Worker v1.3.0: Configurado com sucesso!")

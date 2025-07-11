@@ -386,7 +386,9 @@ export default function ChatApp() {
         recognition.onstart = () => {
           setIsRecording(true)
           setRecordingTime(0)
-          setAccumulatedText("") // Limpar texto acumulado ao iniciar
+          // Manter o texto atual do input como base
+          const currentText = input.trim()
+          setAccumulatedText(currentText)
           recordingIntervalRef.current = setInterval(() => {
             setRecordingTime((prev) => prev + 1)
           }, 1000)
@@ -406,13 +408,16 @@ export default function ChatApp() {
           }
 
           if (finalTranscript) {
+            // Atualizar texto acumulado apenas com o final
             setAccumulatedText((prev) => {
-              const newAccumulated = prev + finalTranscript
-              setInput(newAccumulated + interimTranscript)
+              const newAccumulated = prev + (prev ? " " : "") + finalTranscript
+              // Definir input com texto acumulado + interim (sem duplicação)
+              setInput(newAccumulated + (interimTranscript ? " " + interimTranscript : ""))
               return newAccumulated
             })
           } else {
-            setInput(accumulatedText + interimTranscript)
+            // Apenas interim - mostrar acumulado + interim atual
+            setInput(accumulatedText + (interimTranscript ? (accumulatedText ? " " : "") + interimTranscript : ""))
           }
         }
 
