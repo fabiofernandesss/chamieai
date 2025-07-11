@@ -386,38 +386,48 @@ export default function ChatApp() {
         recognition.onstart = () => {
           setIsRecording(true)
           setRecordingTime(0)
-          // Manter o texto atual do input como base
-          const currentText = input.trim()
-          setAccumulatedText(currentText)
+          // Capturar o texto atual como base para a gravação
+          const baseText = input.trim()
+          setAccumulatedText(baseText)
+          console.log("🎤 Gravação iniciada. Texto base:", baseText)
           recordingIntervalRef.current = setInterval(() => {
             setRecordingTime((prev) => prev + 1)
           }, 1000)
         }
 
         recognition.onresult = (event: any) => {
-          let interimTranscript = ""
-          let finalTranscript = ""
+          let currentInterim = ""
+          let newFinalText = ""
 
+          // Processar apenas os resultados novos (a partir do resultIndex)
           for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript
             if (event.results[i].isFinal) {
-              finalTranscript += transcript
+              newFinalText += transcript
             } else {
-              interimTranscript += transcript
+              currentInterim += transcript
             }
           }
 
-          if (finalTranscript) {
-            // Atualizar texto acumulado apenas com o final
+          // Se temos texto final novo, adicionar ao acumulado
+          if (newFinalText) {
             setAccumulatedText((prev) => {
-              const newAccumulated = prev + (prev ? " " : "") + finalTranscript
-              // Definir input com texto acumulado + interim (sem duplicação)
-              setInput(newAccumulated + (interimTranscript ? " " + interimTranscript : ""))
-              return newAccumulated
+              const separator = prev.trim() ? " " : ""
+              const updated = prev + separator + newFinalText.trim()
+              
+              // Atualizar input: texto acumulado + interim atual
+              const finalInput = updated + (currentInterim.trim() ? " " + currentInterim.trim() : "")
+              setInput(finalInput)
+              
+              return updated
             })
-          } else {
-            // Apenas interim - mostrar acumulado + interim atual
-            setInput(accumulatedText + (interimTranscript ? (accumulatedText ? " " : "") + interimTranscript : ""))
+          } else if (currentInterim) {
+            // Apenas interim: mostrar acumulado + interim sem duplicar
+            setInput((prevInput) => {
+              const base = accumulatedText.trim()
+              const separator = base ? " " : ""
+              return base + separator + currentInterim.trim()
+            })
           }
         }
 
@@ -468,7 +478,11 @@ export default function ChatApp() {
     }
     setIsRecording(false)
     setRecordingTime(0)
-    setAccumulatedText("") // Limpar texto acumulado
+    console.log("🎤 Gravação finalizada. Texto final:", input)
+    // Limpar accumulated text para próxima gravação
+    setTimeout(() => {
+      setAccumulatedText("")
+    }, 100)
   }
 
   const formatRecordingTime = (seconds: number) => {

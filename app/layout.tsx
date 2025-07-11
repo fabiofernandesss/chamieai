@@ -99,13 +99,49 @@ export default function RootLayout({
             __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
+                  navigator.serviceWorker.register('/sw.js', {
+                    scope: '/'
+                  })
                     .then(function(registration) {
-                      console.log('SW registered: ', registration);
+                      console.log('✅ SW registered: ', registration);
+                      
+                      // Forçar ativação se houver SW waiting
+                      if (registration.waiting) {
+                        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                      }
+                      
+                      // Escutar por updates
+                      registration.addEventListener('updatefound', function() {
+                        const newWorker = registration.installing;
+                        if (newWorker) {
+                          newWorker.addEventListener('statechange', function() {
+                            if (newWorker.state === 'installed') {
+                              console.log('🔄 Nova versão SW disponível!');
+                              if (navigator.serviceWorker.controller) {
+                                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                              } else {
+                                console.log('🎉 PWA instalada pela primeira vez!');
+                              }
+                            }
+                          });
+                        }
+                      });
                     })
                     .catch(function(registrationError) {
-                      console.log('SW registration failed: ', registrationError);
+                      console.log('❌ SW registration failed: ', registrationError);
                     });
+                });
+                
+                // Escutar mensagens do SW
+                navigator.serviceWorker.addEventListener('message', function(event) {
+                  if (event.data && event.data.type === 'SW_ACTIVATED') {
+                    console.log('🎉 PWA ativa!', event.data.version);
+                  }
+                });
+                
+                // Detectar quando PWA é instalada
+                navigator.serviceWorker.addEventListener('controllerchange', function() {
+                  console.log('🔄 Service Worker controller mudou - PWA ativa!');
                 });
               }
             `,
