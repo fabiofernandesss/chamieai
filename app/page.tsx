@@ -153,6 +153,89 @@ export default function ChatApp() {
     resizeTextarea()
   }, [input])
 
+  // useEffect para debug do favicon e PWA
+  useEffect(() => {
+    // Debug do favicon
+    console.log("🔍 Verificando favicon...")
+    const faviconLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement
+    if (faviconLink) {
+      console.log("✅ Favicon encontrado:", faviconLink.href)
+      
+      // Testar se o favicon carrega
+      const img = new Image()
+      img.onload = () => console.log("✅ Favicon carregou com sucesso!")
+      img.onerror = () => console.error("❌ Erro ao carregar favicon!")
+      img.src = faviconLink.href
+    } else {
+      console.error("❌ Favicon não encontrado no DOM!")
+    }
+
+    // Debug do PWA
+    console.log("🔍 Verificando PWA...")
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        console.log("📱 Service Workers registrados:", registrations.length)
+        registrations.forEach((registration, index) => {
+          console.log(`SW ${index + 1}:`, registration.scope, registration.active?.state)
+        })
+      })
+    } else {
+      console.warn("⚠️ Service Worker não suportado neste navegador")
+    }
+
+    // Verificar manifest
+    const manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
+    if (manifestLink) {
+      console.log("✅ Manifest encontrado:", manifestLink.href)
+      
+      // Testar se o manifest carrega
+      fetch(manifestLink.href)
+        .then(response => {
+          if (response.ok) {
+            console.log("✅ Manifest carregou com sucesso!")
+            return response.json()
+          } else {
+            throw new Error(`HTTP ${response.status}`)
+          }
+        })
+        .then(manifest => {
+          console.log("📱 Manifest content:", manifest)
+        })
+        .catch(error => {
+          console.error("❌ Erro ao carregar manifest:", error)
+        })
+    } else {
+      console.error("❌ Manifest não encontrado no DOM!")
+    }
+
+    // Verificar se é PWA instalável
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log("📱 PWA é instalável!")
+      e.preventDefault()
+    })
+
+  }, [])
+
+  // Função para gerenciar foco no mobile
+  const handleInputFocus = () => {
+    if (window.innerWidth <= 480) {
+      document.body.classList.add('input-focused')
+      // Scroll para o input após um pequeno delay
+      setTimeout(() => {
+        textareaRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        })
+      }, 300)
+    }
+  }
+
+  const handleInputBlur = () => {
+    if (window.innerWidth <= 480) {
+      document.body.classList.remove('input-focused')
+    }
+  }
+
   const handleStop = () => {
     stop()
     setIsStreaming(false)
@@ -881,6 +964,8 @@ export default function ChatApp() {
                       }
                     }}
                     onInput={resizeTextarea}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
                   />
 
                   <div className="chat-buttons">
