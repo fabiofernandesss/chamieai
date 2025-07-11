@@ -741,32 +741,6 @@ export default function ChatApp() {
             </Container>
           </Box>
 
-          {/* Audio Recording Indicator */}
-          {isRecording && (
-            <div className="audio-recording-indicator">
-              <Flex align="center" justify="between">
-                <Flex align="center" gap="3">
-                  <div className="audio-waveform">
-                    {[...Array(5)].map((_, i) => (
-                      <div key={i} className="audio-waveform-bar"></div>
-                    ))}
-                  </div>
-                  <Text size="2" className="text-red-300 font-modern">
-                    🎤 Gravando... {formatRecordingTime(recordingTime)}
-                  </Text>
-                </Flex>
-                <button
-                  onClick={stopRecording}
-                  className="chat-button chat-button-danger"
-                  style={{ height: "32px", padding: "0 12px" }}
-                >
-                  <StopIcon className="w-3 h-3" />
-                  <span className="text-xs">Parar</span>
-                </button>
-              </Flex>
-            </div>
-          )}
-
           {/* File Upload Progress */}
           {isProcessing && (
             <Box className="file-processing-card p-4">
@@ -787,30 +761,61 @@ export default function ChatApp() {
             </Box>
           )}
 
-          {/* Uploaded File Info */}
-          {uploadedFile && (
-            <Box className="file-upload-card p-4">
-              <Flex align="center" justify="between" className="p-3">
-                <Flex align="center" gap="3">
-                  <FileTextIcon className="w-5 h-5 text-green-400" />
-                  <Box>
-                    <Text size="3" weight="bold" className="text-green-300 font-modern">
-                      📄 {uploadedFile.name}
-                    </Text>
-                    <Text size="2" className="text-green-400 font-modern">
-                      Arquivo carregado! Faça perguntas sobre o conteúdo.
-                    </Text>
-                  </Box>
-                </Flex>
-                <button
-                  onClick={removeFile}
-                  className="chat-button chat-button-danger"
-                  style={{ height: "32px", padding: "0 8px" }}
-                >
-                  <Cross2Icon className="w-3 h-3" />
-                </button>
-              </Flex>
-            </Box>
+          {/* Audio Recording Indicator + Uploaded File Info - Container Combinado */}
+          {(isRecording || uploadedFile) && (
+            <div className="combined-info-container">
+              {/* Audio Recording Indicator */}
+              {isRecording && (
+                <div className="audio-recording-indicator">
+                  <Flex align="center" justify="between">
+                    <Flex align="center" gap="3">
+                      <div className="audio-waveform">
+                        {[...Array(5)].map((_, i) => (
+                          <div key={i} className="audio-waveform-bar"></div>
+                        ))}
+                      </div>
+                      <Text size="2" className="text-red-300 font-modern">
+                        🎤 Gravando... {formatRecordingTime(recordingTime)}
+                      </Text>
+                    </Flex>
+                    <button
+                      onClick={stopRecording}
+                      className="chat-button chat-button-danger"
+                      style={{ height: "32px", padding: "0 12px" }}
+                    >
+                      <StopIcon className="w-3 h-3" />
+                      <span className="text-xs">Parar</span>
+                    </button>
+                  </Flex>
+                </div>
+              )}
+
+              {/* Uploaded File Info */}
+              {uploadedFile && (
+                <Box className="file-upload-card p-4">
+                  <Flex align="center" justify="between" className="p-3">
+                    <Flex align="center" gap="3">
+                      <FileTextIcon className="w-5 h-5 text-green-400" />
+                      <Box>
+                        <Text size="3" weight="bold" className="text-green-300 font-modern">
+                          📄 {uploadedFile.name}
+                        </Text>
+                        <Text size="2" className="text-green-400 font-modern">
+                          Arquivo carregado! Faça perguntas sobre o conteúdo.
+                        </Text>
+                      </Box>
+                    </Flex>
+                    <button
+                      onClick={removeFile}
+                      className="chat-button chat-button-danger"
+                      style={{ height: "32px", padding: "0 8px" }}
+                    >
+                      <Cross2Icon className="w-3 h-3" />
+                    </button>
+                  </Flex>
+                </Box>
+              )}
+            </div>
           )}
 
           {/* Hidden File Input */}
@@ -947,11 +952,7 @@ export default function ChatApp() {
                 <div className="chat-input-wrapper">
                   <textarea
                     ref={textareaRef}
-                    placeholder={
-                      uploadedFile
-                        ? "Pergunte algo sobre o arquivo..."
-                        : "Digite sua mensagem aqui... (Shift+Enter para nova linha)"
-                    }
+                    placeholder="Digite sua mensagem"
                     value={input}
                     onChange={handleInputChange}
                     disabled={isLoading || isRecording}

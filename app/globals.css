@@ -127,6 +127,24 @@
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
+  /* Centralização vertical do texto */
+  display: flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+/* Container combinado para gravador e arquivo */
+.combined-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Melhorar responsividade do container combinado */
+@media (max-width: 768px) {
+  .combined-info-container {
+    gap: 6px;
+  }
 }
 
 .chat-input:focus {
