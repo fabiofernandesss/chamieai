@@ -109,6 +109,9 @@ export default function ChatApp() {
       console.log("✅ Resposta finalizada")
       setIsStreaming(false)
 
+      // Tocar som de resposta recebida
+      playSound('receive')
+
       // Detectar se a resposta pode ter sido truncada
       const content = message.content || ""
       const lastChar = content.trim().slice(-1)
@@ -170,20 +173,46 @@ export default function ChatApp() {
       console.error("❌ Favicon não encontrado no DOM!")
     }
 
-    // Debug do PWA
+    // Debug do PWA - MELHORADO
     console.log("🔍 Verificando PWA...")
+    
+    // Verificar suporte a Service Worker
     if ('serviceWorker' in navigator) {
+      console.log("✅ Service Worker suportado")
+      
       navigator.serviceWorker.getRegistrations().then(registrations => {
         console.log("📱 Service Workers registrados:", registrations.length)
         registrations.forEach((registration, index) => {
-          console.log(`SW ${index + 1}:`, registration.scope, registration.active?.state)
+          console.log(`SW ${index + 1}:`, {
+            scope: registration.scope,
+            state: registration.active?.state,
+            installing: !!registration.installing,
+            waiting: !!registration.waiting,
+            hasUpdateFound: !!registration.onupdatefound
+          })
         })
+        
+        if (registrations.length === 0) {
+          console.warn("⚠️ Nenhum Service Worker registrado ainda")
+        }
+      }).catch(error => {
+        console.error("❌ Erro ao buscar registrations:", error)
       })
+
+      // Escutar eventos do Service Worker
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log("🔄 Service Worker controller mudou!")
+      })
+
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        console.log("📨 Mensagem do SW:", event.data)
+      })
+
     } else {
       console.warn("⚠️ Service Worker não suportado neste navegador")
     }
 
-    // Verificar manifest
+    // Verificar manifest - MELHORADO
     const manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
     if (manifestLink) {
       console.log("✅ Manifest encontrado:", manifestLink.href)
@@ -191,6 +220,7 @@ export default function ChatApp() {
       // Testar se o manifest carrega
       fetch(manifestLink.href)
         .then(response => {
+          console.log("📱 Manifest response status:", response.status)
           if (response.ok) {
             console.log("✅ Manifest carregou com sucesso!")
             return response.json()
@@ -200,6 +230,26 @@ export default function ChatApp() {
         })
         .then(manifest => {
           console.log("📱 Manifest content:", manifest)
+          
+          // Verificar campos obrigatórios
+          const requiredFields = ['name', 'start_url', 'display', 'icons']
+          const missingFields = requiredFields.filter(field => !manifest[field])
+          
+          if (missingFields.length > 0) {
+            console.warn("⚠️ Campos obrigatórios ausentes no manifest:", missingFields)
+          } else {
+            console.log("✅ Manifest válido!")
+          }
+          
+          // Verificar ícones
+          if (manifest.icons && manifest.icons.length > 0) {
+            console.log("🖼️ Ícones no manifest:", manifest.icons.length)
+            manifest.icons.forEach((icon: any, index: number) => {
+              console.log(`Ícone ${index + 1}:`, icon)
+            })
+          } else {
+            console.warn("⚠️ Nenhum ícone encontrado no manifest")
+          }
         })
         .catch(error => {
           console.error("❌ Erro ao carregar manifest:", error)
@@ -208,13 +258,80 @@ export default function ChatApp() {
       console.error("❌ Manifest não encontrado no DOM!")
     }
 
-    // Verificar se é PWA instalável
-    window.addEventListener('beforeinstallprompt', (e) => {
+    // Verificar se é PWA instalável - MELHORADO
+    let deferredPrompt: any = null
+    
+    const handleBeforeInstallPrompt = (e: any) => {
       console.log("📱 PWA é instalável!")
       e.preventDefault()
-    })
+      deferredPrompt = e
+      console.log("💾 Prompt de instalação salvo")
+    }
+    
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
 
+    // Verificar se já está instalado
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      console.log("📱 PWA já está instalado e rodando em modo standalone!")
+    } else {
+      console.log("🌐 PWA rodando no navegador")
+    }
+
+    // Verificar se está sendo servido via HTTPS
+    if (location.protocol === 'https:' || location.hostname === 'localhost') {
+      console.log("🔒 HTTPS ativo - PWA pode funcionar")
+    } else {
+      console.warn("⚠️ PWA requer HTTPS para funcionar completamente")
+    }
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    }
   }, [])
+
+  // Função para tocar sons de feedback
+  const playSound = (type: 'send' | 'receive') => {
+    try {
+      // Criar contexto de áudio se não existir
+      if (typeof window !== 'undefined' && 'AudioContext' in window) {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+        
+        // Configurações dos sons
+        const soundConfig = {
+          send: { frequency: 800, duration: 150, volume: 0.1 },
+          receive: { frequency: 600, duration: 200, volume: 0.1 }
+        }
+        
+        const config = soundConfig[type]
+        
+        // Criar oscilador
+        const oscillator = audioContext.createOscillator()
+        const gainNode = audioContext.createGain()
+        
+        // Conectar nós
+        oscillator.connect(gainNode)
+        gainNode.connect(audioContext.destination)
+        
+        // Configurar som
+        oscillator.type = 'sine'
+        oscillator.frequency.setValueAtTime(config.frequency, audioContext.currentTime)
+        
+        // Envelope de volume (fade in/out)
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime)
+        gainNode.gain.linearRampToValueAtTime(config.volume, audioContext.currentTime + 0.01)
+        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + config.duration / 1000)
+        
+        // Tocar som
+        oscillator.start(audioContext.currentTime)
+        oscillator.stop(audioContext.currentTime + config.duration / 1000)
+        
+        console.log(`🔊 Som ${type} tocado`)
+      }
+    } catch (error) {
+      console.log("🔇 Não foi possível tocar som:", error)
+    }
+  }
 
   // Função para gerenciar foco no mobile
   const handleInputFocus = () => {
@@ -673,6 +790,10 @@ export default function ChatApp() {
       alert("💡 Faça uma pergunta sobre o arquivo carregado!")
       return
     }
+    
+    // Tocar som de envio
+    playSound('send')
+    
     handleSubmit(e)
     setAccumulatedText("") // Limpar texto acumulado após enviar
     // Scroll para baixo após enviar
