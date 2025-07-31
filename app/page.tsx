@@ -14,6 +14,7 @@ import {
   CheckIcon,
 } from "@radix-ui/react-icons"
 import { useChat } from "ai/react"
+import PWAInstallModal from "../components/PWAInstallModal"
 
 // Custom microphone icon component
 const MicrophoneIcon = ({ className }: { className?: string }) => (
@@ -798,6 +799,7 @@ export default function ChatApp() {
 
   return (
     <Theme appearance="dark" className="min-h-screen bg-black font-modern">
+      <PWAInstallModal />
       <Box className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
         <div className="chat-container">
           {/* Header */}
