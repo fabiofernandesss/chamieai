@@ -23,22 +23,32 @@
   height: 100vh;
   max-height: 100vh;
   overflow: hidden;
+  background: linear-gradient(135deg, #0a0a0a 0%, #111111 50%, #0d0d0d 100%);
 }
 
 /* Header */
 .header-container {
   flex-shrink: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 168, 204, 0.1);
   z-index: 10;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Traffic Lights */
 .traffic-light {
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 768px) {
+  .traffic-light {
+    width: 12px;
+    height: 12px;
+  }
 }
 
 .traffic-light-red {
@@ -54,26 +64,36 @@
 }
 
 /* Logo */
-.vini-logo {
+.chamie-logo {
   position: relative;
-  padding: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  border-radius: 12px;
+  padding: 6px;
+  background: linear-gradient(135deg, #00a8cc 0%, #0066cc 50%, #cc3366 100%);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 168, 204, 0.15);
 }
 
-.vini-logo-icon {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+@media (min-width: 768px) {
+  .chamie-logo {
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 168, 204, 0.2);
+  }
+}
+
+.chamie-logo-icon {
+  filter: drop-shadow(0 2px 8px rgba(0, 212, 255, 0.5));
 }
 
 .header-logo {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(135deg, #00a8cc 0%, #0066cc 50%, #cc3366 100%);
   border-radius: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 168, 204, 0.2);
 }
 
 /* Messages Area */
@@ -91,10 +111,11 @@
 /* Input Container */
 .chat-input-container {
   flex-shrink: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(0, 168, 204, 0.1);
   z-index: 10;
+  box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Chat Input Wrapper - NEW */
@@ -108,12 +129,12 @@
 /* Chat Input */
 .chat-input {
   flex: 1;
-  height: 50px; /* Altura fixa inicial igual aos botões */
+  height: 50px;
   min-height: 50px;
   max-height: 150px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 16px;
+  background: rgba(15, 15, 15, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 5px;
   color: white;
   font-size: 14px;
@@ -121,16 +142,23 @@
   transition: all 0.2s ease;
   resize: none;
   font-family: inherit;
-  line-height: 1.4;
-  overflow-y: auto;
+  line-height: 50px;
+  overflow-y: hidden;
   /* Melhorias para mobile */
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
-  /* Centralização vertical do texto */
+  /* Centralização vertical perfeita */
   display: flex;
   align-items: center;
   vertical-align: middle;
+}
+
+/* Quando o textarea expande */
+.chat-input[style*="height"] {
+  line-height: 1.4;
+  padding: 12px 16px;
+  overflow-y: auto;
 }
 
 /* Container combinado para gravador e arquivo */
@@ -148,9 +176,9 @@
 }
 
 .chat-input:focus {
-  border-color: rgba(102, 126, 234, 0.5);
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: rgba(0, 168, 204, 0.4);
+  background: rgba(20, 20, 20, 0.9);
+  box-shadow: 0 0 0 2px rgba(0, 168, 204, 0.15);
 }
 
 .chat-input::placeholder {
@@ -196,26 +224,28 @@
 }
 
 .chat-button-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #00a8cc 0%, #0066cc 100%);
   color: white;
+  box-shadow: 0 1px 6px rgba(0, 168, 204, 0.15);
 }
 
 .chat-button-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  background: linear-gradient(135deg, #0099b8 0%, #0052a3 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 3px 12px rgba(0, 168, 204, 0.25);
 }
 
 .chat-button-secondary {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(15, 15, 15, 0.8);
   color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .chat-button-secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(25, 25, 25, 0.9);
   color: white;
   transform: translateY(-1px);
+  border-color: rgba(0, 212, 255, 0.3);
 }
 
 .chat-button-danger {
@@ -251,18 +281,29 @@
 
 /* Message Cards */
 .message-card-user {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #00a8cc 0%, #0066cc 100%);
   border-radius: 5px;
   color: white;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 168, 204, 0.2);
+  line-height: 1.3;
+}
+
+.message-card-user * {
+  margin: 0;
 }
 
 .message-card-ai {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 15, 15, 0.8);
+  border: 1px solid rgba(0, 168, 204, 0.1);
   border-radius: 5px;
   color: white;
   backdrop-filter: blur(10px);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  line-height: 1.3;
+}
+
+.message-card-ai * {
+  margin: 0;
 }
 
 .chat-card {
@@ -281,8 +322,8 @@
 
 /* File Upload Cards */
 .file-upload-card {
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  background: rgba(0, 168, 204, 0.08);
+  border: 1px solid rgba(0, 168, 204, 0.2);
   border-radius: 12px;
   backdrop-filter: blur(20px);
   position: fixed;
@@ -292,12 +333,12 @@
   max-width: 800px;
   width: calc(100% - 32px);
   z-index: 15;
-  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 168, 204, 0.15);
 }
 
 .file-processing-card {
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: rgba(0, 102, 204, 0.08);
+  border: 1px solid rgba(0, 102, 204, 0.2);
   border-radius: 12px;
   backdrop-filter: blur(20px);
   position: fixed;
@@ -307,7 +348,7 @@
   max-width: 800px;
   width: calc(100% - 32px);
   z-index: 15;
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.15);
 }
 
 /* Progress Bar */
@@ -318,8 +359,9 @@
 }
 
 .progress-indicator {
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(90deg, #00a8cc 0%, #0066cc 50%, #cc3366 100%);
   border-radius: 5px;
+  box-shadow: 0 0 6px rgba(0, 168, 204, 0.2);
 }
 
 /* Audio Recording */
@@ -384,14 +426,15 @@
   position: relative;
   border-radius: 5px;
   overflow: hidden;
-  background: rgba(17, 24, 39, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid rgba(0, 168, 204, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .code-block {
   margin: 0;
   padding: 1rem;
-  background: rgba(17, 24, 39, 0.8);
+  background: rgba(10, 10, 10, 0.95);
   color: #e5e7eb;
   font-family: "SF Mono", Monaco, Inconsolata, "Roboto Mono", Consolas, "Courier New", monospace;
   font-size: 14px;
@@ -402,6 +445,7 @@
   word-wrap: normal;
   max-height: 500px;
   overflow-y: auto;
+  border-left: 2px solid #00a8cc;
 }
 
 .code-block code {
@@ -623,10 +667,10 @@
 .logo-glow {
   position: absolute;
   inset: -20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(135deg, #00a8cc 0%, #0066cc 50%, #cc3366 100%);
   border-radius: 50%;
-  opacity: 0.3;
-  filter: blur(20px);
+  opacity: 0.05;
+  filter: blur(12px);
   animation: pulse-glow 3s ease-in-out infinite;
 }
 
@@ -635,10 +679,10 @@
   width: 4rem;
   height: 4rem;
   color: white;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(135deg, #00a8cc 0%, #0066cc 50%, #cc3366 100%);
   padding: 1rem;
   border-radius: 20px;
-  filter: drop-shadow(0 8px 25px rgba(102, 126, 234, 0.3));
+  filter: drop-shadow(0 1px 4px rgba(0, 168, 204, 0.1));
   animation: float 6s ease-in-out infinite;
 }
 
@@ -655,7 +699,7 @@
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(135deg, #00a8cc 0%, #0066cc 50%, #cc3366 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -675,13 +719,14 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(147, 51, 234, 0.1);
-  border: 1px solid rgba(147, 51, 234, 0.3);
+  background: rgba(0, 168, 204, 0.08);
+  border: 1px solid rgba(0, 168, 204, 0.2);
   border-radius: 12px;
   padding: 0.75rem 1rem;
-  color: #c084fc;
+  color: #4db8d9;
   font-size: 0.9rem;
   animation: tip-pulse 2s ease-in-out infinite;
+  box-shadow: 0 2px 8px rgba(0, 168, 204, 0.05);
 }
 
 .tip-icon {
@@ -696,8 +741,8 @@
 }
 
 .feature-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 15, 15, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   padding: 1.5rem;
   transition: all 0.3s ease;
@@ -705,10 +750,10 @@
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(102, 126, 234, 0.3);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+  transform: translateY(-2px);
+  background: rgba(20, 20, 20, 0.9);
+  border-color: rgba(0, 168, 204, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 168, 204, 0.1);
 }
 
 .feature-icon {
@@ -743,7 +788,7 @@
 
 .cta-arrow {
   font-size: 1.5rem;
-  color: #667eea;
+  color: #00a8cc;
 }
 
 /* Welcome Section Animations */
@@ -873,4 +918,109 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
+}
+
+/* Efeitos Tecnológicos Adicionais */
+.tech-glow {
+  box-shadow: 
+    0 0 3px rgba(0, 168, 204, 0.2),
+    0 0 6px rgba(0, 168, 204, 0.1),
+    0 0 9px rgba(0, 168, 204, 0.05);
+}
+
+.tech-border {
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, rgba(0, 168, 204, 0.08), rgba(0, 102, 204, 0.08)) border-box;
+  border-image: linear-gradient(135deg, #00a8cc, #0066cc) 1;
+}
+
+/* Animação de scan tecnológico */
+@keyframes tech-scan {
+  0% { transform: translateX(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+.tech-scan::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+  animation: tech-scan 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Efeito de pulsação tecnológica */
+@keyframes tech-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 3px rgba(0, 168, 204, 0.2);
+  }
+  50% { 
+    box-shadow: 0 0 8px rgba(0, 168, 204, 0.4), 0 0 12px rgba(0, 102, 204, 0.2);
+  }
+}
+
+.tech-pulse {
+  animation: tech-pulse 2s ease-in-out infinite;
+}
+
+/* Gradiente animado para elementos especiais */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animated-gradient {
+  background: linear-gradient(270deg, #00a8cc, #0066cc, #cc3366, #00a8cc);
+  background-size: 400% 400%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* Efeito de matriz/código */
+.matrix-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(0, 128, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+/* Hover effects tecnológicos */
+.tech-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 15px rgba(0, 168, 204, 0.2),
+    0 0 10px rgba(0, 168, 204, 0.1);
+  border-color: rgba(0, 168, 204, 0.3);
+}
+
+/* Scrollbar com tema tecnológico */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(10, 10, 10, 0.8);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #00a8cc, #0066cc);
+  border-radius: 4px;
+  box-shadow: 0 0 3px rgba(0, 168, 204, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #0099b8, #0052a3);
+  box-shadow: 0 0 6px rgba(0, 168, 204, 0.3);
 }

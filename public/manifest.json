@@ -1,15 +1,21 @@
 {
-  "name": "Vini AI - Assistente Inteligente",
-  "short_name": "Vini AI",
-  "description": "Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.",
+  "name": "Chamie AI - Assistente Inteligente",
+  "short_name": "Chamie AI",
+  "description": "Seu assistente inteligente para responder perguntas, gerar código e resolver qualquer parada.",
   "start_url": "/",
   "id": "/",
   "display": "standalone",
   "background_color": "#000000",
-  "theme_color": "#667eea",
+  "theme_color": "#00d4ff",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
     {
       "src": "/favicon.png",
       "sizes": "32x32",
@@ -34,7 +40,7 @@
     {
       "name": "Nova Conversa",
       "short_name": "Chat",
-      "description": "Iniciar uma nova conversa com Vini AI",
+      "description": "Iniciar uma nova conversa com Chamie AI",
       "url": "/",
       "icons": [
         {

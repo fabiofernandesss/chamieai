@@ -1,7 +1,11 @@
-FAVICON VINI AI
-===============
+FAVICON CHAMIE AI
+=================
 
-Favicon criado especialmente para o projeto Vini AI.
+Favicon criado especialmente para o projeto Chamie AI.
+
+Design: Logo com gradiente tecnológico (ciano → azul forte → rosa)
+Formato: SVG otimizado para qualidade em qualquer tamanho
+Ícone: Chat bubble com pontos, representando IA conversacional
 
 Características:
 - Formato: SVG (32x32px)

@@ -1,4 +1,4 @@
-const CACHE_NAME = "vini-ai-v1.3.0"
+const CACHE_NAME = "chamie-ai-v1.3.0"
 const urlsToCache = [
   "/",
   "/favicon.png",

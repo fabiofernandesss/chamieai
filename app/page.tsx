@@ -42,7 +42,7 @@ const CodeBlock = ({
   return (
     <Box className="space-y-2">
       <Flex align="center" justify="between" className="mb-2">
-        <span className="chat-badge text-xs px-2 py-1 bg-blue-500/20 text-blue-300 border border-blue-500/30">
+        <span className="chat-badge text-xs px-2 py-1 bg-blue-600/20 text-blue-300 border border-blue-600/30">
           {language.toUpperCase()}
         </span>
         <button
@@ -52,7 +52,7 @@ const CodeBlock = ({
           {isCopied ? (
             <>
               <CheckIcon className="w-3 h-3" />
-              Copiado!
+              Copiado, massa!
             </>
           ) : (
             <>
@@ -142,7 +142,7 @@ export default function ChatApp() {
     if (textareaRef.current) {
       // Reset para altura mínima
       textareaRef.current.style.height = "50px"
-      
+
       // Se há conteúdo, calcular nova altura
       if (textareaRef.current.value.trim()) {
         const newHeight = Math.max(50, Math.min(textareaRef.current.scrollHeight, 150))
@@ -163,7 +163,7 @@ export default function ChatApp() {
     const faviconLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement
     if (faviconLink) {
       console.log("✅ Favicon encontrado:", faviconLink.href)
-      
+
       // Testar se o favicon carrega
       const img = new Image()
       img.onload = () => console.log("✅ Favicon carregou com sucesso!")
@@ -175,11 +175,11 @@ export default function ChatApp() {
 
     // Debug do PWA - MELHORADO
     console.log("🔍 Verificando PWA...")
-    
+
     // Verificar suporte a Service Worker
     if ('serviceWorker' in navigator) {
       console.log("✅ Service Worker suportado")
-      
+
       navigator.serviceWorker.getRegistrations().then(registrations => {
         console.log("📱 Service Workers registrados:", registrations.length)
         registrations.forEach((registration, index) => {
@@ -191,7 +191,7 @@ export default function ChatApp() {
             hasUpdateFound: !!registration.onupdatefound
           })
         })
-        
+
         if (registrations.length === 0) {
           console.warn("⚠️ Nenhum Service Worker registrado ainda")
         }
@@ -216,7 +216,7 @@ export default function ChatApp() {
     const manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
     if (manifestLink) {
       console.log("✅ Manifest encontrado:", manifestLink.href)
-      
+
       // Testar se o manifest carrega
       fetch(manifestLink.href)
         .then(response => {
@@ -230,17 +230,17 @@ export default function ChatApp() {
         })
         .then(manifest => {
           console.log("📱 Manifest content:", manifest)
-          
+
           // Verificar campos obrigatórios
           const requiredFields = ['name', 'start_url', 'display', 'icons']
           const missingFields = requiredFields.filter(field => !manifest[field])
-          
+
           if (missingFields.length > 0) {
             console.warn("⚠️ Campos obrigatórios ausentes no manifest:", missingFields)
           } else {
             console.log("✅ Manifest válido!")
           }
-          
+
           // Verificar ícones
           if (manifest.icons && manifest.icons.length > 0) {
             console.log("🖼️ Ícones no manifest:", manifest.icons.length)
@@ -260,14 +260,14 @@ export default function ChatApp() {
 
     // Verificar se é PWA instalável - MELHORADO
     let deferredPrompt: any = null
-    
+
     const handleBeforeInstallPrompt = (e: any) => {
       console.log("📱 PWA é instalável!")
       e.preventDefault()
       deferredPrompt = e
       console.log("💾 Prompt de instalação salvo")
     }
-    
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
 
     // Verificar se já está instalado
@@ -296,36 +296,36 @@ export default function ChatApp() {
       // Criar contexto de áudio se não existir
       if (typeof window !== 'undefined' && 'AudioContext' in window) {
         const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-        
+
         // Configurações dos sons
         const soundConfig = {
           send: { frequency: 800, duration: 150, volume: 0.1 },
           receive: { frequency: 600, duration: 200, volume: 0.1 }
         }
-        
+
         const config = soundConfig[type]
-        
+
         // Criar oscilador
         const oscillator = audioContext.createOscillator()
         const gainNode = audioContext.createGain()
-        
+
         // Conectar nós
         oscillator.connect(gainNode)
         gainNode.connect(audioContext.destination)
-        
+
         // Configurar som
         oscillator.type = 'sine'
         oscillator.frequency.setValueAtTime(config.frequency, audioContext.currentTime)
-        
+
         // Envelope de volume (fade in/out)
         gainNode.gain.setValueAtTime(0, audioContext.currentTime)
         gainNode.gain.linearRampToValueAtTime(config.volume, audioContext.currentTime + 0.01)
         gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + config.duration / 1000)
-        
+
         // Tocar som
         oscillator.start(audioContext.currentTime)
         oscillator.stop(audioContext.currentTime + config.duration / 1000)
-        
+
         console.log(`🔊 Som ${type} tocado`)
       }
     } catch (error) {
@@ -339,9 +339,9 @@ export default function ChatApp() {
       document.body.classList.add('input-focused')
       // Scroll para o input após um pequeno delay
       setTimeout(() => {
-        textareaRef.current?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
+        textareaRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
         })
       }, 300)
     }
@@ -393,11 +393,25 @@ export default function ChatApp() {
           recordingIntervalRef.current = setInterval(() => {
             setRecordingTime((prev) => prev + 1)
           }, 1000)
+
+          // Iniciar timer de silêncio inicial
+          silenceTimerRef.current = setTimeout(() => {
+            if (isRecording) {
+              console.log("🎤 Parando gravação por silêncio inicial (3s)")
+              stopRecording()
+            }
+          }, 3000)
         }
 
         recognition.onresult = (event: any) => {
           let currentInterim = ""
           let newFinalText = ""
+
+          // Limpar timer de silêncio quando há atividade de voz
+          if (silenceTimerRef.current) {
+            clearTimeout(silenceTimerRef.current)
+            silenceTimerRef.current = null
+          }
 
           // Processar apenas os resultados novos (a partir do resultIndex)
           for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -414,11 +428,11 @@ export default function ChatApp() {
             setAccumulatedText((prev) => {
               const separator = prev.trim() ? " " : ""
               const updated = prev + separator + newFinalText.trim()
-              
+
               // Atualizar input: texto acumulado + interim atual
               const finalInput = updated + (currentInterim.trim() ? " " + currentInterim.trim() : "")
               setInput(finalInput)
-              
+
               return updated
             })
           } else if (currentInterim) {
@@ -429,38 +443,42 @@ export default function ChatApp() {
               return base + separator + currentInterim.trim()
             })
           }
+
+          // Iniciar timer de silêncio de 3 segundos
+          silenceTimerRef.current = setTimeout(() => {
+            if (isRecording) {
+              console.log("🎤 Parando gravação por silêncio (3s)")
+              stopRecording()
+            }
+          }, 3000)
         }
 
         recognition.onerror = (event: any) => {
           console.error("Erro no reconhecimento de voz:", event.error)
           stopRecording()
-          alert("❌ Erro no reconhecimento de voz. Tente novamente.")
+          alert("❌ Eita, deu erro no reconhecimento de voz. Tente de novo, meu rei!")
         }
 
         recognition.onend = () => {
-          // Não parar imediatamente - dar tempo para pausas naturais
-          if (isRecording) {
-            silenceTimerRef.current = setTimeout(() => {
-              if (isRecording) {
-                try {
-                  recognition.start()
-                } catch (error) {
-                  console.error("Erro ao reiniciar reconhecimento:", error)
-                  stopRecording()
-                }
-              }
-            }, 2000) // Esperar 2 segundos antes de reiniciar
+          // Reiniciar reconhecimento se ainda estiver gravando (a menos que seja parada por silêncio)
+          if (isRecording && !silenceTimerRef.current) {
+            try {
+              recognition.start()
+            } catch (error) {
+              console.error("Erro ao reiniciar reconhecimento:", error)
+              stopRecording()
+            }
           }
         }
 
         recognitionRef.current = recognition
         recognition.start()
       } else {
-        alert("❌ Seu navegador não suporta reconhecimento de voz.")
+        alert("❌ Oxente, seu navegador não suporta reconhecimento de voz não, bichinho.")
       }
     } catch (error) {
       console.error("Erro ao iniciar gravação:", error)
-      alert("❌ Erro ao acessar o microfone. Verifique as permissões.")
+      alert("❌ Vixe, erro ao acessar o microfone. Dê uma olhada nas permissões aí, meu rei!")
     }
   }
 
@@ -528,7 +546,7 @@ export default function ChatApp() {
 
     // Validar formato
     if (!file.name.toLowerCase().endsWith(".txt")) {
-      alert("❌ Apenas arquivos .txt são aceitos!")
+      alert("❌ Oxente, só aceito arquivos .txt, viu!")
       return
     }
 
@@ -567,7 +585,7 @@ export default function ChatApp() {
       }, 500)
     } catch (error) {
       console.error("Erro ao processar arquivo:", error)
-      alert("❌ Erro ao processar o arquivo!")
+      alert("❌ Eita, deu erro ao processar o arquivo!")
       setIsProcessing(false)
       setUploadProgress(0)
     }
@@ -588,7 +606,7 @@ export default function ChatApp() {
     if (lastMessage) {
       await append({
         role: "user",
-        content: "Continue a resposta anterior, por favor.",
+        content: "Oxente, continue a resposta anterior aí, por favor!",
       })
     }
     setContinuingMessage(null)
@@ -598,11 +616,10 @@ export default function ChatApp() {
   const renderMarkdownText = (text: string) => {
     const lines = text.split('\n')
     const elements: React.ReactNode[] = []
-    
+
     lines.forEach((line, lineIndex) => {
       if (line.trim() === '') {
-        elements.push(<br key={`br-${lineIndex}`} />)
-        return
+        return // Remove linhas vazias
       }
 
       // Processar linha por linha
@@ -616,9 +633,9 @@ export default function ChatApp() {
         const indent = listMatch[1].length
         const content = listMatch[2]
         const processedContent = processInlineFormatting(content, `${lineIndex}-list`)
-        
+
         elements.push(
-          <div key={`list-${lineIndex}`} className={`flex items-start gap-2 my-1 ${indent > 0 ? 'ml-4' : ''}`}>
+          <div key={`list-${lineIndex}`} className={`flex items-start gap-2 ${indent > 0 ? 'ml-4' : ''}`}>
             <span className="text-blue-400 mt-1 text-sm">•</span>
             <span className="flex-1">{processedContent}</span>
           </div>
@@ -632,11 +649,11 @@ export default function ChatApp() {
         const level = headerMatch[1].length
         const content = headerMatch[2]
         const processedContent = processInlineFormatting(content, `${lineIndex}-header`)
-        
-        const headerClass = level === 1 ? 'text-xl font-bold text-white mb-2' :
-                           level === 2 ? 'text-lg font-bold text-gray-200 mb-2' :
-                           'text-base font-semibold text-gray-300 mb-1'
-        
+
+        const headerClass = level === 1 ? 'text-xl font-bold text-white' :
+          level === 2 ? 'text-lg font-bold text-gray-200' :
+            'text-base font-semibold text-gray-300'
+
         elements.push(
           <div key={`header-${lineIndex}`} className={headerClass}>
             {processedContent}
@@ -648,13 +665,13 @@ export default function ChatApp() {
       // Linha normal com formatação inline
       const processedContent = processInlineFormatting(currentText, lineIndex.toString())
       elements.push(
-        <div key={`line-${lineIndex}`} className="leading-relaxed">
+        <div key={`line-${lineIndex}`} className="leading-tight">
           {processedContent}
         </div>
       )
     })
 
-    return <div className="space-y-1">{elements}</div>
+    return <div>{elements}</div>
   }
 
   // Função para processar formatação inline (negrito, itálico)
@@ -727,7 +744,7 @@ export default function ChatApp() {
 
     // Detecta blocos de código em tempo real
     const codeBlockRegex = /```(\w+)?\n?([\s\S]*?)```/g
-    const parts: Array<{type: "text" | "code", content: string, key: string, language?: string}> = []
+    const parts: Array<{ type: "text" | "code", content: string, key: string, language?: string }> = []
     let lastIndex = 0
     let match
 
@@ -773,14 +790,14 @@ export default function ChatApp() {
     // Se não há código, retorna texto com formatação markdown
     if (parts.length === 0) {
       return (
-        <div className="whitespace-pre-wrap leading-relaxed font-modern text-gray-200">
-          {renderMarkdownText(content)}
+        <div className="leading-tight font-modern text-gray-200">
+          {renderMarkdownText(content.trim())}
         </div>
       )
     }
 
     return (
-      <div className="message-content space-y-4">
+      <div className="message-content space-y-2">
         {parts.map((part, index) => {
           if (part.type === "code") {
             return (
@@ -794,8 +811,8 @@ export default function ChatApp() {
             )
           } else {
             return (
-              <div key={part.key} className="whitespace-pre-wrap leading-relaxed font-modern text-gray-200">
-                {renderMarkdownText(part.content)}
+              <div key={part.key} className="leading-tight font-modern text-gray-200">
+                {renderMarkdownText(part.content.trim())}
               </div>
             )
           }
@@ -806,13 +823,13 @@ export default function ChatApp() {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     if (uploadedFile && !input.trim()) {
-      alert("💡 Faça uma pergunta sobre o arquivo carregado!")
+      alert("💡 Oxente, faça uma pergunta sobre o arquivo carregado, meu rei!")
       return
     }
-    
+
     // Tocar som de envio
     playSound('send')
-    
+
     handleSubmit(e)
     setAccumulatedText("") // Limpar texto acumulado após enviar
     // Scroll para baixo após enviar
@@ -823,30 +840,30 @@ export default function ChatApp() {
 
   return (
     <Theme appearance="dark" className="min-h-screen bg-black font-modern">
-      <Box className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+      <Box className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
         <div className="chat-container">
           {/* Header */}
           <Box className="header-container">
             <Container size="3" className="p-4 md:p-6">
               <Flex align="center" justify="between">
                 {/* Left Side - Logo and Title */}
-                <Flex align="center" gap="4">
-                  {/* macOS Traffic Lights - Hidden on mobile */}
-                  <Flex gap="2" className="hidden md:flex">
+                <Flex align="center" gap="3" className="md:gap-4">
+                  {/* macOS Traffic Lights - Smaller on mobile, centered */}
+                  <Flex gap="1.5" className="md:gap-2 md:mr-1">
                     <Box className="traffic-light traffic-light-red"></Box>
                     <Box className="traffic-light traffic-light-yellow"></Box>
                     <Box className="traffic-light traffic-light-green"></Box>
                   </Flex>
 
                   <Flex align="center" gap="3">
-                    <div className="vini-logo">
-                      <ChatBubbleIcon className="vini-logo-icon w-6 h-6 text-white" />
+                    <div className="chamie-logo">
+                      <ChatBubbleIcon className="chamie-logo-icon w-5 h-5 md:w-6 md:h-6 text-white" />
                     </div>
                     <Box>
-                      <Text size="5" weight="bold" className="text-white font-modern">
-                        Vini AI
+                      <Text size="4" className="md:text-xl font-bold text-white font-modern">
+                        Chamie AI
                       </Text>
-                      <Text size="2" className="text-gray-400 hidden md:block font-modern">
+                      <Text size="1" className="text-gray-400 hidden md:block font-modern md:text-sm">
                         Assistente Inteligente
                       </Text>
                     </Box>
@@ -862,7 +879,7 @@ export default function ChatApp() {
                     className="chat-button chat-button-secondary"
                   >
                     <UploadIcon className="w-4 h-4" />
-                    <span className="hidden md:inline">Upload</span>
+                    <span className="hidden md:inline">Arquivo</span>
                   </button>
 
                   {/* Status Badge */}
@@ -888,7 +905,7 @@ export default function ChatApp() {
                 <FileTextIcon className="w-5 h-5 text-blue-400" />
                 <Box className="flex-1">
                   <Text size="2" className="text-gray-300 mb-2 font-modern">
-                    Processando arquivo... {uploadProgress}%
+                    Eita, processando o arquivo aqui... {uploadProgress}%
                   </Text>
                   <div className="progress-root h-2 w-full">
                     <div
@@ -973,27 +990,27 @@ export default function ChatApp() {
                         <div className="logo-glow"></div>
                         <ChatBubbleIcon className="logo-icon" />
                       </div>
-                      
+
                       {/* Texto principal */}
                       <div className="welcome-text">
                         <h1 className="welcome-title">
-                          Olá! Eu sou a <span className="gradient-text">Vini AI</span>
+                          Eita! Eu sou o <span className="gradient-text">Chamie AI</span>
                         </h1>
                         <p className="welcome-subtitle">
-                          Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.
+                          Arretado pra responder perguntas, gerar códigos HTML e resolver qualquer parada!
                         </p>
                         {!uploadedFile && (
                           <div className="welcome-tip">
                             <span className="tip-icon">💡</span>
                             <span className="tip-text">
-                              Faça upload de um arquivo .txt para fazer perguntas sobre seu conteúdo!
+                              Eita, faça upload de um arquivo .txt ou pdf pra fazer perguntas sobre o conteúdo!
                             </span>
                           </div>
                         )}
                       </div>
-                      
 
-                      
+
+
                       {/* Call to action */}
                       <div className="welcome-cta">
                         <div className="cta-text">Comece digitando sua pergunta abaixo</div>
@@ -1002,11 +1019,11 @@ export default function ChatApp() {
                     </div>
                   </div>
                 ) : (
-                  <Box className="space-y-6">
+                  <Box className="space-y-4">
                     {messages.map((message) => (
                       <Flex key={message.id} className={message.role === "user" ? "justify-end" : "justify-start"}>
                         <Box className={`max-w-[85%] md:max-w-[75%]`}>
-                          <div className={`p-4 ${message.role === "user" ? "message-card-user" : "message-card-ai"}`}>
+                          <div className={`p-3 ${message.role === "user" ? "message-card-user" : "message-card-ai"}`}>
                             {message.role === "user" ? (
                               <Text className="whitespace-pre-wrap leading-relaxed font-modern">{message.content}</Text>
                             ) : (
@@ -1014,7 +1031,7 @@ export default function ChatApp() {
                             )}
                           </div>
                           {message.role === "assistant" && truncatedMessages.has(message.id) && (
-                            <Box className="mt-3">
+                            <Box className="mt-2">
                               <button
                                 onClick={() => continueResponse(message.id)}
                                 disabled={continuingMessage === message.id || isLoading}
@@ -1029,15 +1046,15 @@ export default function ChatApp() {
                                 ) : (
                                   <>
                                     <PaperPlaneIcon className="w-3 h-3 mr-2" />
-                                    Continuar resposta
+                                    Continuar aí
                                   </>
                                 )}
                               </button>
                             </Box>
                           )}
-                          <Box className={`mt-2 px-2 ${message.role === "user" ? "text-right" : "text-left"}`}>
+                          <Box className={`mt-1 px-2 ${message.role === "user" ? "text-right" : "text-left"}`}>
                             <Text size="1" className="text-gray-500 font-modern">
-                              {message.role === "user" ? "Você" : "Vini AI"}
+                              {message.role === "user" ? "Você" : "Chamie AI"}
                             </Text>
                           </Box>
                         </Box>
@@ -1047,7 +1064,7 @@ export default function ChatApp() {
                     {isLoading && (
                       <Flex justify="start">
                         <Box className="max-w-[85%] md:max-w-[75%]">
-                          <div className="message-card-ai p-4">
+                          <div className="message-card-ai p-3">
                             <Flex align="center" gap="2">
                               <Flex gap="1">
                                 {[0, 1, 2].map((i) => (
@@ -1059,7 +1076,7 @@ export default function ChatApp() {
                                 ))}
                               </Flex>
                               <Text size="2" className="text-gray-400 font-modern">
-                                Vini AI está pensando...
+                                Chamie AI tá pensando aqui, viu...
                               </Text>
                             </Flex>
                           </div>
@@ -1072,7 +1089,7 @@ export default function ChatApp() {
                         <Box className="max-w-[85%] md:max-w-[75%]">
                           <div className="p-4 bg-red-800/40 border border-red-700/50 chat-card">
                             <Text size="2" className="text-red-300 font-modern">
-                              ❌ Erro: {error.message}
+                              ❌ Vixe, deu erro: {error.message}
                             </Text>
                           </div>
                         </Box>

@@ -8,32 +8,32 @@ import "@radix-ui/themes/styles.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Vini AI - Assistente Inteligente",
-  description: "Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.",
-  keywords: ["AI", "Assistente", "Chat", "Inteligência Artificial", "Vini AI"],
-  authors: [{ name: "Vini AI Team" }],
-  creator: "Vini AI",
-  publisher: "Vini AI",
+  title: "Chamie AI - Assistente Inteligente",
+  description: "Seu assistente inteligente para responder perguntas, gerar código e resolver qualquer parada.",
+  keywords: ["AI", "Assistente", "Chat", "Inteligência Artificial", "Chamie AI"],
+  authors: [{ name: "Chamie AI Team" }],
+  creator: "Chamie AI",
+  publisher: "Chamie AI",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://viniai.vercel.app"),
+  metadataBase: new URL("https://chamieai.vercel.app"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Vini AI - Assistente Inteligente",
-    description: "Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.",
-    url: "https://viniai.vercel.app",
-    siteName: "Vini AI",
+    title: "Chamie AI - Assistente Inteligente",
+    description: "Seu assistente inteligente para responder perguntas, gerar código e resolver qualquer parada.",
+    url: "https://chamieai.vercel.app",
+    siteName: "Chamie AI",
     images: [
       {
         url: "/metatag.png",
         width: 1200,
         height: 630,
-        alt: "Vini AI - Assistente Inteligente",
+        alt: "Chamie AI - Assistente Inteligente",
       },
     ],
     locale: "pt_BR",
@@ -41,10 +41,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vini AI - Assistente Inteligente",
-    description: "Seu assistente inteligente para responder perguntas, gerar código e ajudar com qualquer tarefa.",
+    title: "Chamie AI - Assistente Inteligente",
+    description: "Seu assistente inteligente para responder perguntas, gerar código e resolver qualquer parada.",
     images: ["/metatag.png"],
-    creator: "@viniai",
+    creator: "@chamieai",
   },
   robots: {
     index: true,
@@ -60,9 +60,10 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon.png", type: "image/png", sizes: "32x32" },
     ],
-    shortcut: "/favicon.png",
+    shortcut: "/favicon.svg",
     apple: [
       { url: "/favicon.png", type: "image/png", sizes: "180x180" },
     ],
@@ -70,11 +71,11 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Vini AI",
+    title: "Chamie AI",
   },
-  applicationName: "Vini AI",
+  applicationName: "Chamie AI",
   category: "productivity",
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -85,10 +86,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        <meta name="theme-color" content="#667eea" />
-        <meta name="msapplication-TileColor" content="#667eea" />
+        <meta name="theme-color" content="#00d4ff" />
+        <meta name="msapplication-TileColor" content="#00d4ff" />
 
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
         <link rel="apple-touch-icon" href="/favicon.png" type="image/png" sizes="180x180" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
