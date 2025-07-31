@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     siteName: "Chamie AI",
     images: [
       {
-        url: "https://chamieai.vercel.app/metatag.png",
+        url: "https://chamieai.vercel.app/Metatag.png",
         width: 1200,
         height: 630,
         alt: "Chamie AI - Assistente Inteligente",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Chamie AI - Assistente Inteligente",
     description: "Seu assistente inteligente para responder perguntas, gerar código e resolver qualquer parada.",
-    images: ["https://chamieai.vercel.app/metatag.png"],
+    images: ["https://chamieai.vercel.app/Metatag.png"],
     creator: "@chamieai",
   },
   robots: {
