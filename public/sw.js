@@ -119,6 +119,26 @@ self.addEventListener("fetch", (event) => {
     return
   }
 
+  // Handle navigation requests (deep links) - sempre retorna a página principal
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            return response
+          }
+          // Se falhar, retorna página principal para SPA routing
+          return caches.match('/') || fetch('/')
+        })
+        .catch(() => {
+          // Fallback offline - sempre retorna página principal
+          console.log("🔄 Deep link offline fallback:", event.request.url)
+          return caches.match('/') || new Response('Offline', { status: 503 })
+        })
+    )
+    return
+  }
+
   // Estratégia network-first para HTML e API
   event.respondWith(
     fetch(event.request)
@@ -140,10 +160,6 @@ self.addEventListener("fetch", (event) => {
             if (response) {
               console.log("📦 Fallback cache:", event.request.url)
               return response
-            }
-            // Se for uma navegação, retornar página principal
-            if (event.request.destination === 'document') {
-              return caches.match('/')
             }
             return new Response('Offline', { status: 503 })
           })

@@ -2,13 +2,19 @@
   "name": "Chamie AI - Assistente Inteligente",
   "short_name": "Chamie AI",
   "description": "Seu assistente inteligente para responder perguntas, gerar código e resolver qualquer parada.",
-  "start_url": "/",
-  "id": "/",
+  "start_url": "/?utm_source=pwa",
+  "id": "chamie-ai-pwa",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
   "orientation": "portrait-primary",
   "scope": "/",
+  "protocol_handlers": [
+    {
+      "protocol": "web+chamieai",
+      "url": "/?action=%s"
+    }
+  ],
   "icons": [
     {
       "src": "/favicon.svg",
@@ -25,6 +31,18 @@
     {
       "src": "/favicon.png",
       "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/Metatag.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Metatag.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }

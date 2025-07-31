@@ -23,6 +23,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+  },
   openGraph: {
     title: "Chamie AI - Assistente Inteligente",
     description: "Seu assistente inteligente para responder perguntas, gerar código e resolver qualquer parada.",

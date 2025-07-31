@@ -159,6 +159,16 @@ export default function ChatApp() {
 
   // useEffect para debug do favicon e PWA
   useEffect(() => {
+    // Detectar se veio de deep link (PWA)
+    const urlParams = new URLSearchParams(window.location.search)
+    const isFromPWA = urlParams.get('utm_source') === 'pwa'
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    
+    if (isFromPWA || isStandalone) {
+      console.log("📱 Aberto via PWA/Deep Link!")
+      // Opcional: analytics ou comportamento específico para PWA
+    }
+
     // Debug do favicon
     console.log("🔍 Verificando favicon...")
     const faviconLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement
