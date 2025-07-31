@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Box, Text, Flex } from "@radix-ui/themes"
+import { Text } from "@radix-ui/themes"
 import { Cross2Icon, DownloadIcon } from "@radix-ui/react-icons"
 
 interface BeforeInstallPromptEvent extends Event {
@@ -98,11 +98,11 @@ export default function PWAInstallModal() {
 
             {/* Texto */}
             <div className="pwa-modal-text">
-              <Text size="4" weight="bold" className="text-white font-modern mb-2">
+              <Text size="4" weight="bold" className="text-white font-modern mb-3 block">
                 Instalar Chamie AI
               </Text>
-              <Text size="2" className="text-gray-300 font-modern mb-4">
-               <p>Que tal instalar o app pra ter acesso mais rápido, iai boy?</p>Que tal instalar o app pra ter acesso mais rápido, iai boy?
+              <Text size="2" className="text-gray-300 font-modern mb-4 leading-relaxed block">
+                Oxente! Que tal instalar o app pra ter acesso mais rápido, meu rei?
               </Text>
             </div>
 
