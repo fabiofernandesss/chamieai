@@ -1,17 +1,25 @@
 import { streamText } from "ai"
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
 
-// Verificar se a chave da API está configurada
-if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-  throw new Error("GOOGLE_GENERATIVE_AI_API_KEY não está configurada nas variáveis de ambiente")
-}
-
 const google = createGoogleGenerativeAI({
-  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY!,
 })
 
 export async function POST(req: Request) {
   try {
+    // Verificar se a chave da API está configurada (runtime check)
+    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+      return new Response(
+        JSON.stringify({
+          error: "GOOGLE_GENERATIVE_AI_API_KEY não está configurada nas variáveis de ambiente",
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        },
+      )
+    }
+
     const { messages, fileContext, requireFileContext } = await req.json()
 
     console.log("📤 Mensagens recebidas:", messages)
