@@ -102,7 +102,7 @@ export default function PWAInstallModal() {
                 Instalar Chamie AI
               </Text>
               <Text size="2" className="text-gray-300 font-modern mb-4">
-                Oxente! Que tal instalar o app pra ter acesso mais rápido, meu rei?
+                 Que tal instalar o app pra ter acesso mais rápido, iai boy?
               </Text>
             </div>
 
