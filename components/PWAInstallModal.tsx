@@ -16,11 +16,11 @@ export default function PWAInstallModal() {
   useEffect(() => {
     // Detectar se é Android
     const isAndroid = /Android/i.test(navigator.userAgent)
-    
+
     // Detectar se já está instalado como PWA
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                        (window.navigator as any).standalone ||
-                        document.referrer.includes('android-app://')
+      (window.navigator as any).standalone ||
+      document.referrer.includes('android-app://')
 
     // Verificar se já foi dispensado antes (localStorage)
     const wasDismissed = localStorage.getItem('pwa-install-dismissed') === 'true'
@@ -34,7 +34,7 @@ export default function PWAInstallModal() {
       e.preventDefault()
       const promptEvent = e as BeforeInstallPromptEvent
       setDeferredPrompt(promptEvent)
-      
+
       // Mostrar modal após 2 segundos
       setTimeout(() => {
         setShowModal(true)
@@ -54,12 +54,12 @@ export default function PWAInstallModal() {
     try {
       await deferredPrompt.prompt()
       const { outcome } = await deferredPrompt.userChoice
-      
+
       console.log(`PWA install prompt: ${outcome}`)
-      
+
       setShowModal(false)
       setDeferredPrompt(null)
-      
+
       // Salvar que o usuário interagiu
       localStorage.setItem('pwa-install-dismissed', 'true')
     } catch (error) {
@@ -89,9 +89,9 @@ export default function PWAInstallModal() {
           <div className="pwa-modal-content">
             {/* Imagem */}
             <div className="pwa-modal-image">
-              <img 
-                src="/Metatag.png" 
-                alt="Chamie AI" 
+              <img
+                src="/Metatag.png"
+                alt="Chamie AI"
                 className="pwa-modal-img"
               />
             </div>
@@ -102,7 +102,7 @@ export default function PWAInstallModal() {
                 Instalar Chamie AI
               </Text>
               <Text size="2" className="text-gray-300 font-modern mb-4">
-                 Que tal instalar o app pra ter acesso mais rápido, iai boy?
+               <p>Que tal instalar o app pra ter acesso mais rápido, iai boy?</p>Que tal instalar o app pra ter acesso mais rápido, iai boy?
               </Text>
             </div>
 
