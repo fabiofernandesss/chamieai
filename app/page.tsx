@@ -378,79 +378,45 @@ export default function ChatApp() {
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
         const recognition = new SpeechRecognition()
 
-        recognition.continuous = true
-        recognition.interimResults = true
+        recognition.continuous = false
+        recognition.interimResults = false
         recognition.lang = "pt-BR"
         recognition.maxAlternatives = 1
 
         recognition.onstart = () => {
           setIsRecording(true)
           setRecordingTime(0)
-          // Capturar o texto atual como base para a gravação
-          const baseText = input.trim()
-          setAccumulatedText(baseText)
-          console.log("🎤 Gravação iniciada. Texto base:", baseText)
+          console.log("🎤 Gravação iniciada")
           recordingIntervalRef.current = setInterval(() => {
             setRecordingTime((prev) => prev + 1)
           }, 1000)
 
-          // Iniciar timer de silêncio inicial
+          // Timer de 3 segundos
           silenceTimerRef.current = setTimeout(() => {
             if (isRecording) {
-              console.log("🎤 Parando gravação por silêncio inicial (3s)")
+              console.log("🎤 Parando por tempo limite")
               stopRecording()
             }
           }, 3000)
         }
 
         recognition.onresult = (event: any) => {
-          let currentInterim = ""
-          let newFinalText = ""
-
-          // Limpar timer de silêncio quando há atividade de voz
+          // Limpar timer
           if (silenceTimerRef.current) {
             clearTimeout(silenceTimerRef.current)
             silenceTimerRef.current = null
           }
 
-          // Processar apenas os resultados novos (a partir do resultIndex)
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript
-            if (event.results[i].isFinal) {
-              newFinalText += transcript
-            } else {
-              currentInterim += transcript
-            }
-          }
-
-          // Se temos texto final novo, adicionar ao acumulado
-          if (newFinalText) {
-            setAccumulatedText((prev) => {
-              const separator = prev.trim() ? " " : ""
-              const updated = prev + separator + newFinalText.trim()
-
-              // Atualizar input: texto acumulado + interim atual
-              const finalInput = updated + (currentInterim.trim() ? " " + currentInterim.trim() : "")
-              setInput(finalInput)
-
-              return updated
-            })
-          } else if (currentInterim) {
-            // Apenas interim: mostrar acumulado + interim sem duplicar
-            setInput((prevInput) => {
-              const base = accumulatedText.trim()
-              const separator = base ? " " : ""
-              return base + separator + currentInterim.trim()
-            })
-          }
-
-          // Iniciar timer de silêncio de 3 segundos
-          silenceTimerRef.current = setTimeout(() => {
-            if (isRecording) {
-              console.log("🎤 Parando gravação por silêncio (3s)")
-              stopRecording()
-            }
-          }, 3000)
+          // Pegar apenas o resultado final (sem interim)
+          const transcript = event.results[0][0].transcript
+          
+          // Adicionar ao input existente
+          const currentText = input.trim()
+          const separator = currentText ? " " : ""
+          const newText = currentText + separator + transcript.trim()
+          
+          setInput(newText)
+          console.log("🎤 Texto reconhecido:", transcript)
         }
 
         recognition.onerror = (event: any) => {
@@ -460,15 +426,7 @@ export default function ChatApp() {
         }
 
         recognition.onend = () => {
-          // Reiniciar reconhecimento se ainda estiver gravando (a menos que seja parada por silêncio)
-          if (isRecording && !silenceTimerRef.current) {
-            try {
-              recognition.start()
-            } catch (error) {
-              console.error("Erro ao reiniciar reconhecimento:", error)
-              stopRecording()
-            }
-          }
+          stopRecording()
         }
 
         recognitionRef.current = recognition
