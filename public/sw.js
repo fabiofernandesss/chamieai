@@ -1,6 +1,7 @@
 const CACHE_NAME = "chamie-ai-v1.3.0"
 const urlsToCache = [
   "/",
+  "/icon.png",
   "/favicon.png",
   "/metatag.png",
   "/manifest.json",
